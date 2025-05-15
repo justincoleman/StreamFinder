@@ -1,25 +1,25 @@
 <template>
   <div class="container mx-auto p-4 sm:p-6 min-h-screen bg-gray-25 max-w-full sm:max-w-3xl">
     <header class="mb-8">
-      <div class="flex justify-start items-center mb-4">
-        <router-link
-            to="/select-subscriptions"
-            class="text-blue-600 hover:text-blue-800 transition-colors duration-150 flex items-center text-sm font-medium"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-1">
-            <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-          </svg>
-          Back to Subscription Selection
-        </router-link>
-      </div>
       <div class="text-center">
         <h1 class="text-2xl sm:text-4xl font-bold text-blue-700">Streaming Options</h1>
         <p v-if="store.selectedLeagueIds.length > 0" class="text-base sm:text-lg text-gray-600 mt-2">
           Based on your selection of <span class="font-semibold">{{ selectedLeagueNames }}</span>.
         </p>
-         <p v-else class="text-base sm:text-lg text-gray-600 mt-2">
+        <p v-else class="text-base sm:text-lg text-gray-600 mt-2">
           Please select some leagues to see relevant streaming options.
         </p>
+        <div class="mt-6">
+          <router-link
+              to="/select-subscriptions"
+              class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-150 shadow-sm hover:shadow"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-2">
+              <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+            </svg>
+            Back to Subscription Selection
+          </router-link>
+        </div>
       </div>
     </header>
 
@@ -132,6 +132,18 @@
       </div>
     </main>
 
+    <div class="mt-12 text-center">
+      <button
+        @click="resetEverything"
+        class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-150 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-2">
+          <path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd" />
+        </svg>
+        Start Over
+      </button>
+    </div>
+
     <footer class="text-center mt-12 py-6 text-sm text-gray-500">
       <p>&copy; {{ new Date().getFullYear() }} StreamFinder. All rights reserved.</p>
     </footer>
@@ -143,8 +155,10 @@ import { computed, ref } from 'vue';
 import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
 import StreamingServiceCard from '@/components/StreamingServiceCard.vue'; // Assuming correct path
 import BundleCard from '@/components/BundleCard.vue'; // Assuming correct path
+import { useRouter } from 'vue-router';
 
 const store = useStreamingStoreWithPersistence();
+const router = useRouter();
 const showOtherOptions = ref(false);
 const sortBy = ref('price'); // 'price' or 'leagues'
 const sortOrder = ref('asc'); // 'asc' or 'desc'
@@ -190,6 +204,12 @@ const sortedOtherOptions = computed(() => {
 const selectedLeagueNames = computed(() => {
   return store.selectedLeagues.map(league => league.name).join(', ');
 });
+
+const resetEverything = () => {
+  store.selectedLeagueIds = [];
+  store.subscribedServiceIds = [];
+  router.push('/');
+};
 </script>
 
 <style scoped>
