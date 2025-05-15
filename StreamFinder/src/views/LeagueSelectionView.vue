@@ -1,8 +1,8 @@
 <template>
-  <div class="container mx-auto p-6 min-h-screen bg-gray-25">
+  <div class="container mx-auto p-4 sm:p-6 min-h-screen bg-gray-25 max-w-full sm:max-w-xl">
     <header class="mb-8 text-center">
-      <h1 class="text-4xl font-bold text-blue-700">StreamFinder</h1>
-      <p class="text-lg text-gray-600 mt-2">
+      <h1 class="text-2xl sm:text-4xl font-bold text-blue-700">StreamFinder</h1>
+      <p class="text-base sm:text-lg text-gray-600 mt-2">
         Find the best streaming services for your favorite sports leagues.
       </p>
     </header>
@@ -48,8 +48,12 @@ const navigateToSelectSubscriptions = () => { // Renamed function
 </script>
 
 <style scoped>
-/* Add any view-specific styles if necessary */
 .container {
-  max-width: 800px;
+  max-width: 100%;
+}
+@media (min-width: 640px) {
+  .container {
+    max-width: 800px;
+  }
 }
 </style>

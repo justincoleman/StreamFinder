@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto p-4 sm:p-6 min-h-screen bg-gray-25">
+  <div class="container mx-auto p-4 sm:p-6 min-h-screen bg-gray-25 max-w-full sm:max-w-3xl">
     <header class="mb-8">
       <div class="flex justify-start items-center mb-4">
         <router-link
@@ -13,11 +13,11 @@
         </router-link>
       </div>
       <div class="text-center">
-        <h1 class="text-3xl sm:text-4xl font-bold text-blue-700">Streaming Options</h1>
-        <p v-if="store.selectedLeagueIds.length > 0" class="text-md sm:text-lg text-gray-600 mt-2">
+        <h1 class="text-2xl sm:text-4xl font-bold text-blue-700">Streaming Options</h1>
+        <p v-if="store.selectedLeagueIds.length > 0" class="text-base sm:text-lg text-gray-600 mt-2">
           Based on your selection of <span class="font-semibold">{{ selectedLeagueNames }}</span>.
         </p>
-         <p v-else class="text-md sm:text-lg text-gray-600 mt-2">
+         <p v-else class="text-base sm:text-lg text-gray-600 mt-2">
           Please select some leagues to see relevant streaming options.
         </p>
       </div>
@@ -161,7 +161,12 @@ const selectedLeagueNames = computed(() => {
 
 <style scoped>
 .container {
-  max-width: 1200px;
+  max-width: 100%;
+}
+@media (min-width: 640px) {
+  .container {
+    max-width: 1200px;
+  }
 }
 .max-h-\[5000px\] {
     max-height: 5000px;

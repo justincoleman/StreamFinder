@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto p-4 sm:p-6 min-h-screen bg-gray-25">
+  <div class="container mx-auto p-4 sm:p-6 min-h-screen bg-gray-25 max-w-full sm:max-w-xl">
     <header class="mb-8">
       <div class="flex justify-start items-center mb-4">
         <router-link to="/" class="text-blue-600 hover:text-blue-800 transition-colors duration-150 flex items-center text-sm font-medium">
@@ -10,8 +10,8 @@
         </router-link>
       </div>
       <div class="text-center">
-        <h1 class="text-3xl sm:text-4xl font-bold text-blue-700">My Current Subscriptions</h1>
-        <p class="text-md sm:text-lg text-gray-600 mt-2">
+        <h1 class="text-2xl sm:text-4xl font-bold text-blue-700">My Current Subscriptions</h1>
+        <p class="text-base sm:text-lg text-gray-600 mt-2">
           Select any streaming services you already subscribe to. This will help us tailor your results.
         </p>
       </div>
@@ -133,15 +133,15 @@ const selectedServiceNames = computed(() => {
   // that are in the subscribedServiceIds list.
   return store.subscribedServicesDetails.map(service => service.name).join(', ');
 });
-
-const topPicks = computed(() => {
-  const tcPick = topCoveragePick.value;
-  return tcPick ? [tcPick] : [];
-});
 </script>
 
 <style scoped>
 .container {
-  max-width: 800px;
+  max-width: 100%;
+}
+@media (min-width: 640px) {
+  .container {
+    max-width: 800px;
+  }
 }
 </style>
