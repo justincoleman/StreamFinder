@@ -1,11 +1,9 @@
 <template>
   <div
-    class="border rounded-lg shadow-md p-5 md:p-6 mb-8 hover:shadow-lg transition-shadow duration-200 relative h-full flex flex-col"
+    class="rounded-2xl shadow-xl p-6 md:p-8 mb-8 border border-slate-700/50 bg-slate-700/80 backdrop-blur-md transition-all duration-300 relative h-full flex flex-col"
     :class="[
-      (service.isSubscribed && !isSecondaryOption && !isPrimaryRecommendation) ? 'border-green-400 bg-green-50 ring-1 ring-green-200' :
-      (isSecondaryOption && service.isSubscribed) ? 'bg-white border-gray-300' :
-      'border-gray-300 bg-white',
-      {'border-2 border-teal-500 bg-teal-50 ring-teal-300': service.badge === 'Best Value' && isPrimaryRecommendation}
+      (service.isSubscribed && !isSecondaryOption && !isPrimaryRecommendation) ? 'ring-2 ring-emerald-400/60' : '',
+      (service.badge === 'Best Value' && isPrimaryRecommendation) ? 'ring-2 ring-teal-400/60' : ''
     ]"
   >
     <div
@@ -33,13 +31,13 @@
 
 
     <div class="flex flex-col sm:flex-row justify-between sm:items-start mb-3 pt-4">
-      <h3 class="text-xl font-bold mb-2 sm:mb-0"
+      <h3 class="text-xl font-bold mb-2 sm:mb-0 text-slate-100"
           :class="[
             isMainPick ? 'md:text-2xl' : 'md:text-lg',
-            {'text-green-700': service.isSubscribed && !isSecondaryOption && !service.badge},
-            {'text-teal-700': service.badge === 'Best Value' && isPrimaryRecommendation},
-            {'text-blue-700': !service.isSubscribed && !service.badge && !isSecondaryOption},
-            {'text-gray-700': isSecondaryOption && !service.badge}
+            {'text-emerald-400': service.isSubscribed && !isSecondaryOption && !service.badge},
+            {'text-teal-300': service.badge === 'Best Value' && isPrimaryRecommendation},
+            {'text-blue-300': !service.isSubscribed && !service.badge && !isSecondaryOption},
+            {'text-slate-300': isSecondaryOption && !service.badge}
           ]">
         {{ service.name || service.displayName }}
       </h3>
@@ -53,33 +51,33 @@
       </a>
     </div>
 
-    <p class="text-md sm:text-md text-gray-700 mb-1 pb-3 border-b"
+    <p class="text-md sm:text-md text-slate-300 mb-1 pb-3 border-b"
        :class="{
-         'border-green-200': service.isSubscribed && !isSecondaryOption && !service.badge,
-         'border-teal-200': service.badge === 'Best Value' && isPrimaryRecommendation,
-         'border-gray-200': !isPrimaryRecommendation || !service.badge || isSecondaryOption
+         'border-emerald-400/30': service.isSubscribed && !isSecondaryOption && !service.badge,
+         'border-teal-400/30': service.badge === 'Best Value' && isPrimaryRecommendation,
+         'border-slate-600/60': !isPrimaryRecommendation || !service.badge || isSecondaryOption
        }">
       <span class="font-semibold">Price: </span>
-      <span v-if="service.isSubscribed && !isSecondaryOption" class="text-green-600 font-bold">$0.00 (Already Subscribed)</span>
-      <span v-else-if="service.isSubscribed && isSecondaryOption" class="text-gray-600">{{ service.originalService ? service.originalService.price : (service.numericPrice !== Infinity ? service.numericPrice.toFixed(2) : 'N/A') }} <span class="text-xs">(Subscribed)</span></span>
+      <span v-if="service.isSubscribed && !isSecondaryOption" class="text-emerald-400 font-bold">$0.00 (Already Subscribed)</span>
+      <span v-else-if="service.isSubscribed && isSecondaryOption" class="text-slate-300">{{ service.originalService ? service.originalService.price : (service.numericPrice !== Infinity ? service.numericPrice.toFixed(2) : 'N/A') }} <span class="text-xs">(Subscribed)</span></span>
       <span v-else>{{ service.originalService ? service.originalService.price : (service.numericPrice !== Infinity ? service.numericPrice.toFixed(2) : 'N/A') }}</span>
-      <span v-if="!service.isSubscribed && service.numericPrice !== Infinity" class="text-xs text-gray-500 ml-1">(${{ service.numericPrice.toFixed(2) }}/mo value)</span>
+      <span v-if="!service.isSubscribed && service.numericPrice !== Infinity" class="text-xs text-slate-500 ml-1">(${{ service.numericPrice.toFixed(2) }}/mo value)</span>
     </p>
 
-    <p v-if="service.notes" class="text-xs sm:text-sm text-gray-600 my-3 italic">
+    <p v-if="service.notes" class="text-xs sm:text-sm text-slate-400 my-3 italic">
       {{ service.notes }}
     </p>
 
     <div class="mt-auto">
       <div v-if="Object.keys(service.selectedLeaguesCoveredDetails || {}).length > 0" class="pt-4 border-t"
           :class="{
-            'border-green-200': service.isSubscribed && !isSecondaryOption && !service.badge,
-            'border-teal-200': service.badge === 'Best Value' && isPrimaryRecommendation,
-            'border-gray-200': !isPrimaryRecommendation || !service.badge || isSecondaryOption
+            'border-emerald-400/30': service.isSubscribed && !isSecondaryOption && !service.badge,
+            'border-teal-400/30': service.badge === 'Best Value' && isPrimaryRecommendation,
+            'border-slate-600/60': !isPrimaryRecommendation || !service.badge || isSecondaryOption
           }">
         <button
             @click="toggleChannelsVisibility"
-            class="w-full text-left text-sm font-semibold text-gray-600 hover:text-gray-800 mb-1 py-2 rounded-md focus:outline-none flex justify-between items-center"
+            class="w-full text-left text-sm font-semibold text-slate-300 hover:text-slate-100 mb-1 py-2 rounded-md focus:outline-none flex justify-between items-center"
           >
             <span>Leagues & Channels Covered ({{ service.totalCoveredLeaguesCount }})</span>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 transition-transform duration-200" :class="{'rotate-180': channelsVisible}">
@@ -89,14 +87,14 @@
           <transition name="fade-slide">
             <div v-show="channelsVisible">
               <ul class="list-none pl-0 space-y-1.5 text-xs mt-2">
-                <li v-for="(leagueData, leagueId) in service.selectedLeaguesCoveredDetails" :key="leagueId" class="p-2.5 bg-gray-50 rounded shadow-sm">
-                  <div class="flex items-center mb-0.5">
-                    <span class="mr-1.5 text-lg w-6 text-center">{{ leagueData.icon }}</span>
-                    <strong class="text-gray-700">{{ leagueData.name }}:</strong>
+                <li v-for="(leagueData, leagueId) in service.selectedLeaguesCoveredDetails" :key="leagueId" class="p-4 bg-slate-800/80 rounded-xl border border-slate-700/60 shadow-sm mb-2">
+                  <div class="flex items-center mb-1">
+                    <span class="mr-2 text-lg w-6 text-center">{{ leagueData.icon }}</span>
+                    <span class="font-bold text-slate-100 text-base">{{ leagueData.name }}:</span>
                   </div>
-                  <p class="ml-8 text-xs text-gray-500 leading-snug">
+                  <p class="ml-8 text-sm text-slate-300 leading-snug">
                     <span v-for="(channel, index) in leagueData.channels" :key="index">
-                      {{ channel.replace(/\s*\(on.*?\)\s*/g, '') }}<span class="text-gray-400 font-medium italic text-[0.7rem]">{{ channel.match(/\s*\(on.*?\)\s*/g) ? channel.match(/\s*\(on.*?\)\s*/g)[0] : '' }}</span>{{ index < leagueData.channels.length - 1 ? ', ' : '' }}
+                      {{ channel.replace(/\s*\(on.*?\)\s*/g, '') }}<span class="text-slate-400 font-medium italic text-xs">{{ channel.match(/\s*\(on.*?\)\s*/g) ? channel.match(/\s*\(on.*?\)\s*/g)[0] : '' }}</span>{{ index < leagueData.channels.length - 1 ? ', ' : '' }}
                     </span>
                   </p>
                 </li>
@@ -104,11 +102,11 @@
             </div>
         </transition>
       </div>
-      <div v-else class="mt-4 pt-4 border-t text-sm text-gray-500"
+      <div v-else class="mt-4 pt-4 border-t text-sm text-slate-500"
             :class="{
-              'border-green-200': service.isSubscribed && !isSecondaryOption && !service.badge,
-              'border-teal-200': service.badge === 'Best Value' && isPrimaryRecommendation,
-              'border-gray-200': !isPrimaryRecommendation || !service.badge || isSecondaryOption
+              'border-emerald-400/30': service.isSubscribed && !isSecondaryOption && !service.badge,
+              'border-teal-400/30': service.badge === 'Best Value' && isPrimaryRecommendation,
+              'border-slate-600/60': !isPrimaryRecommendation || !service.badge || isSecondaryOption
             }">
           This service does not cover any of your selected leagues with the current data.
       </div>

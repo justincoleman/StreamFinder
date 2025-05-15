@@ -37,7 +37,12 @@
       "ucl": { "channels": ["CBS (Finals via local affiliate if available)"] },
       "fifa_wc": { "channels": ["FOX", "FS1"] },
       "olympics_summer": { "channels": ["NBC", "USA Network", "CNBC", "MSNBC", "Golf Channel"] },
-      "olympics_winter": { "channels": ["NBC", "USA Network", "CNBC", "MSNBC"] }
+      "olympics_winter": { "channels": ["NBC", "USA Network", "CNBC", "MSNBC"] },
+      "ncaa_football": { "channels": ["ABC", "ESPN", "ESPN2", "FOX", "CBS", "NBC"] },
+      "ncaa_basketball": { "channels": ["CBS", "TBS", "TNT", "truTV", "ESPN", "ESPN2", "ESPNU", "ABC"] },
+      "seriea": { "channels": ["CBS Sports Network (select games)"] },
+      "ligue1": { "channels": ["beIN Sports (not always available)"] },
+      "uel": { "channels": ["CBS Sports Network (select games)"] }
     },
     "notes": "Includes Disney+ and ESPN+ (which has separate sports content)."
   },

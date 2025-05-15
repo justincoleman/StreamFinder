@@ -27,21 +27,21 @@ const getBundleCoverageDetails = (() => {
       return cache.get(cacheKey);
     }
 
-    const coveredLeaguesSet = new Set();
+  const coveredLeaguesSet = new Set();
     const coveredLeaguesDetails = {};
 
-    servicesInBundle.forEach(service => {
-      selectedLeagueIds.forEach(leagueId => {
+  servicesInBundle.forEach(service => {
+    selectedLeagueIds.forEach(leagueId => {
         if (service.leagues && service.leagues[leagueId]) {
-          coveredLeaguesSet.add(leagueId);
-          const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
-          if (!coveredLeaguesDetails[leagueId]) {
-            coveredLeaguesDetails[leagueId] = {
-              name: leagueInfo ? leagueInfo.name : leagueId,
-              icon: leagueInfo ? leagueInfo.icon : '?',
+        coveredLeaguesSet.add(leagueId);
+        const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
+        if (!coveredLeaguesDetails[leagueId]) {
+          coveredLeaguesDetails[leagueId] = {
+            name: leagueInfo ? leagueInfo.name : leagueId,
+            icon: leagueInfo ? leagueInfo.icon : '?',
               channels: [],
-            };
-          }
+          };
+        }
           const serviceChannels = service.leagues[leagueId].channels.map(ch => `${ch} (on ${service.name})`);
           coveredLeaguesDetails[leagueId].channels = [...new Set([...(coveredLeaguesDetails[leagueId].channels || []), ...serviceChannels])];
         }
@@ -91,13 +91,13 @@ export const useStreamingStore = defineStore('streaming', {
 
     processedAvailableServicesFlat() {
       if (!Array.isArray(this.allAvailableServices)) {
-        return [];
-      }
+            return [];
+        }
       return this.allAvailableServices.map(s => ({
-        ...s,
+            ...s,
         numericPrice: parsePrice(s.price),
         isSubscribed: this.subscribedServiceIds.includes(s.id),
-      }));
+        }));
     },
 
     selectedLeagues(state) {
@@ -201,8 +201,8 @@ export const useStreamingStore = defineStore('streaming', {
               additionalCost
             );
             if (bundle) bundles.push(bundle);
+              }
           }
-        }
       }
 
       // Process bundles more efficiently
@@ -219,9 +219,9 @@ export const useStreamingStore = defineStore('streaming', {
 
           if (coverage.count === 0) return null;
 
-          const item = {
-            ...bundleProto,
-            id: canonicalBundleId,
+              const item = {
+                ...bundleProto,
+                id: canonicalBundleId,
             type: 'bundle',
             totalCoveredLeaguesCount: coverage.count,
             selectedLeaguesCoveredDetails: coverage.details,
@@ -239,12 +239,12 @@ export const useStreamingStore = defineStore('streaming', {
           };
 
           // Calculate newly covered leagues
-          Object.keys(coverage.details).forEach(leagueId => {
+              Object.keys(coverage.details).forEach(leagueId => {
             const isNewServiceBundle = item.servicesInvolved.every(s => !userSubscribedServices.find(us => us.id === s.id));
             if (!baseCoveredLeagueIds.has(leagueId) || isNewServiceBundle) {
-              item.newlyCoveredLeaguesDetails[leagueId] = coverage.details[leagueId];
-            }
-          });
+                  item.newlyCoveredLeaguesDetails[leagueId] = coverage.details[leagueId];
+                }
+              });
 
           return item;
         })
@@ -274,7 +274,7 @@ export const useStreamingStore = defineStore('streaming', {
             id: subscribedService.id,
             name: subscribedService.name,
             price: subscribedService.price,
-            numericPrice: subscribedService.numericPrice
+              numericPrice: subscribedService.numericPrice
           }));
         topCoverageItem.potentialSavings = topCoverageItem.redundantSubscriptions.reduce((sum, s) => sum + s.numericPrice, 0);
       }
@@ -312,8 +312,8 @@ export const useStreamingStore = defineStore('streaming', {
               numericPrice: subscribedService.numericPrice
             }));
           bestValueCheaperItem.potentialSavings = bestValueCheaperItem.redundantSubscriptions.reduce((sum, s) => sum + s.numericPrice, 0);
+          }
         }
-      }
 
       // Assemble final list
       const finalList = [];
@@ -343,17 +343,17 @@ export const useStreamingStore = defineStore('streaming', {
             id: service.id,
             type: 'service',
             servicesInvolved: [service],
-            displayName: service.name,
-            totalCoveredLeaguesCount: coverage.count,
-            selectedLeaguesCoveredDetails: coverage.details,
+                    displayName: service.name,
+                    totalCoveredLeaguesCount: coverage.count,
+                    selectedLeaguesCoveredDetails: coverage.details,
             additionalNumericCost: effectiveNumericPrice,
             numericPrice: service.numericPrice,
-            totalNumericPrice: service.numericPrice,
+                    totalNumericPrice: service.numericPrice,
             isSubscribed: service.isSubscribed,
             valueScore: effectiveNumericPrice > 0 ? coverage.count / effectiveNumericPrice : (coverage.count > 0 ? Infinity : 0),
             badge: null,
             notes: service.notes,
-            link: service.link,
+                    link: service.link,
             originalService: service,
             newlyCoveredLeaguesDetails: {}
           };
@@ -369,8 +369,8 @@ export const useStreamingStore = defineStore('streaming', {
       remainingServices.forEach(item => {
         if (!finalList.some(fi => fi.id === item.id)) {
           finalList.push(item);
-        }
-      });
+            }
+        });
 
       return finalList;
     }

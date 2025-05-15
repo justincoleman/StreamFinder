@@ -1,12 +1,12 @@
 <template>
   <div>
-    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-gray-700">
+    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-white">
       Select Your Favorite Leagues
     </h2>
-    <div class="mb-6 flex space-x-3">
+    <div class="mb-6 flex justify-end space-x-3">
       <button
         @click="store.selectAllLeagues()"
-        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150 min-h-[44px] min-w-[44px]"
+        class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-150 min-h-[44px] min-w-[44px]"
       >
         Select All Leagues
       </button>
@@ -19,20 +19,20 @@
     </div>
 
     <div class="space-y-4">
-      <div v-for="category in store.allLeaguesByCategory" :key="category.categoryName" class="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+      <div v-for="category in store.allLeaguesByCategory" :key="category.categoryName" class="border border-slate-700/50 rounded-xl shadow-lg overflow-hidden bg-slate-800/30 backdrop-blur-sm">
         <button
           @click="store.toggleCategoryExpansion(category.categoryName)"
-          class="w-full flex justify-between items-center p-2 sm:p-4 bg-gray-100 hover:bg-gray-200 transition-colors duration-150 focus:outline-none"
+          class="w-full flex justify-between items-center p-3 sm:p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 hover:from-slate-700/50 hover:to-slate-600/50 transition-all duration-300 focus:outline-none"
         >
           <div class="flex items-center">
-            <!-- <span class="text-base sm:text-lg mr-3">{{ category.icon }}</span> -->
-            <span class="font-semibold text-base sm:text-lg text-gray-800 break-words">{{ category.categoryName }}</span>
+            <span class="mr-2 text-xl">{{ category.icon || '🏆' }}</span>
+            <span class="font-semibold text-base sm:text-lg text-slate-200 break-words">{{ category.categoryName }}</span>
           </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 20 20"
             fill="currentColor"
-            class="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 transition-transform duration-200"
+            class="w-5 h-5 sm:w-6 sm:h-6 text-slate-400 transition-transform duration-300"
             :class="{'rotate-180': store.expandedCategories.includes(category.categoryName)}"
           >
             <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
@@ -47,21 +47,21 @@
           leave-from-class="transform opacity-100 translate-y-0 max-h-screen"
           leave-to-class="transform opacity-0 -translate-y-4 max-h-0"
         >
-          <div v-show="store.expandedCategories.includes(category.categoryName)" class="p-2 sm:p-4 bg-white">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+          <div v-show="store.expandedCategories.includes(category.categoryName)" class="p-4 bg-slate-800/20">
+            <div class="space-y-2">
               <button
                 v-for="league in category.leagues"
                 :key="league.id"
                 @click="store.toggleLeagueSelection(league.id)"
                 :class="[
-                  'px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-start text-left w-full shadow-sm hover:shadow-md min-h-[44px] min-w-[44px] gap-x-2 break-words',
+                  'w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 flex items-center justify-between shadow-sm hover:shadow-md',
                   store.selectedLeagueIds.includes(league.id)
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-blue-400'
+                    ? 'bg-gradient-to-r from-blue-500/20 to-indigo-600/20 text-white hover:from-blue-500/30 hover:to-indigo-600/30 focus:ring-blue-500 border border-blue-500/30'
+                    : 'bg-slate-700/30 text-slate-300 hover:bg-slate-700/50 focus:ring-slate-500 border border-slate-700/50'
                 ]"
               >
-                <span class="text-base sm:text-lg mr-2 w-5 text-center">{{ league.icon }}</span>
-                <span class="break-words">{{ league.name }}</span>
+                <span>{{ league.name }}</span>
+                <span v-if="store.selectedLeagueIds.includes(league.id)" class="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full font-semibold border border-blue-500/30">Selected</span>
               </button>
             </div>
           </div>
@@ -75,7 +75,7 @@
         {{ selectedLeagueNames }}
       </p>
     </div>
-  </div>
+    </div>
 </template>
 
 <script setup>
@@ -94,6 +94,6 @@ onMounted(() => {
     store.expandedCategories = store.allLeaguesByCategory.map(cat => cat.categoryName);
   } else {
     store.expandedCategories = [];
-  }
-});
+        }
+    });
 </script>
