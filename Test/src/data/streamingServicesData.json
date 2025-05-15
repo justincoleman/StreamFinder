@@ -1,0 +1,98 @@
+[
+  {
+    "id": "netflix",
+    "name": "Netflix",
+    "price": "15.49",
+    "type": "General Entertainment",
+    "logo": "/src/assets/logos/netflix.png",
+    "leaguesCovered": []
+  },
+  {
+    "id": "hulu",
+    "name": "Hulu (with Live TV)",
+    "price": "76.99",
+    "type": "Live TV & On-Demand",
+    "logo": "/src/assets/logos/hulu.png",
+    "leaguesCovered": ["NFL", "NBA", "MLB", "NHL", "EPL", "MLS", "NCAAF", "NCAAB"]
+  },
+  {
+    "id": "espn_plus",
+    "name": "ESPN+",
+    "price": "10.99",
+    "type": "Sports Streaming",
+    "logo": "/src/assets/logos/espn_plus.png",
+    "leaguesCovered": ["MLS", "NHL", "MLB", "NCAAF", "NCAAB", "UFC", "LaLiga", "Bundesliga", "FA_Cup", "PGA_Golf"]
+  },
+  {
+    "id": "amazon_prime_video",
+    "name": "Amazon Prime Video",
+    "price": "8.99",
+    "type": "General Entertainment",
+    "logo": "/src/assets/logos/amazon_prime_video.png",
+    "leaguesCovered": ["NFL_TNF"]
+  },
+  {
+    "id": "youtube_tv",
+    "name": "YouTube TV",
+    "price": "72.99",
+    "type": "Live TV",
+    "logo": "/src/assets/logos/youtube_tv.png",
+    "leaguesCovered": ["NFL", "NBA", "MLB", "NHL", "EPL", "MLS", "NCAAF", "NCAAB", "WNBA", "Tennis_Majors"]
+  },
+  {
+    "id": "fubo_tv",
+    "name": "FuboTV",
+    "price": "79.99",
+    "type": "Live TV (Sports Focus)",
+    "logo": "/src/assets/logos/fubotv.png",
+    "leaguesCovered": ["NFL", "NBA", "MLB", "NHL", "EPL", "MLS", "NCAAF", "NCAAB", "LaLiga", "SerieA", "Ligue1", "Bundesliga", "CONCACAF", "CONMEBOL"]
+  },
+  {
+    "id": "peacock",
+    "name": "Peacock Premium",
+    "price": "5.99",
+    "type": "General Entertainment & Sports",
+    "logo": "/src/assets/logos/peacock.png",
+    "leaguesCovered": ["EPL", "NFL_SNF", "Olympics", "IndyCar", "WWE"]
+  },
+  {
+    "id": "paramount_plus",
+    "name": "Paramount+",
+    "price": "5.99",
+    "type": "General Entertainment & Sports",
+    "logo": "/src/assets/logos/paramount_plus.png",
+    "leaguesCovered": ["NFL_CBS", "SerieA", "ChampionsLeague", "EuropaLeague", "NWSL", "NCAAB_MarchMadness"]
+  },
+  {
+    "id": "apple_tv_plus",
+    "name": "Apple TV+",
+    "price": "9.99",
+    "type": "General Entertainment & Sports",
+    "logo": "/src/assets/logos/apple_tv_plus.png",
+    "leaguesCovered": ["MLS_Season_Pass", "MLB_FridayNight"]
+  },
+  {
+    "id": "sling_orange",
+    "name": "Sling Orange",
+    "price": "40.00",
+    "type": "Live TV (Basic)",
+    "logo": "/src/assets/logos/sling.png",
+    "leaguesCovered": ["NBA_ESPN", "NHL_ESPN", "NCAAF_ESPN", "NCAAB_ESPN", "F1_ESPN"]
+  },
+  {
+    "id": "sling_blue",
+    "name": "Sling Blue",
+    "price": "40.00",
+    "type": "Live TV (Basic)",
+    "logo": "/src/assets/logos/sling.png",
+    "leaguesCovered": ["NFL_Network", "NHL_TNT", "MLS_FS1", "NCAAF_FS1"]
+  },
+  {
+    "id": "directv_stream_entertainment",
+    "name": "DirecTV Stream (Entertainment)",
+    "price": "79.99",
+    "type": "Live TV",
+    "logo": "/src/assets/logos/directv_stream.png",
+    "leaguesCovered": ["NFL", "NBA", "MLB", "NHL", "NCAAF", "NCAAB"]
+  }
+]

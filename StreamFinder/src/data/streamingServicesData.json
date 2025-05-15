@@ -1,0 +1,239 @@
+[
+  {
+    "id": "ytv",
+    "name": "YouTube TV",
+    "serviceCategory": "Live TV Streaming",
+    "price": "$72.99/mo",
+    "leagues": {
+      "nfl": { "channels": ["CBS", "FOX", "NBC", "ESPN", "NFL Network"] },
+      "nba": { "channels": ["ABC", "ESPN", "TNT", "NBA TV"] },
+      "mlb": { "channels": ["FOX", "FS1", "ESPN", "MLB Network", "TBS"] },
+      "nhl": { "channels": ["ABC", "ESPN", "TNT", "NHL Network"] },
+      "epl": { "channels": ["NBC", "USA Network", "CNBC", "Golf Channel"] },
+      "f1": { "channels": ["ESPN", "ESPN2", "ABC"] },
+      "laliga": { "channels": ["ESPN", "ESPN Deportes"] },
+      "bundesliga": { "channels": ["ESPN", "ESPN Deportes"] },
+      "ucl": { "channels": ["CBS (Finals)", "Univision (some games)"] },
+      "fifa_wc": { "channels": ["FOX", "FS1"] },
+      "olympics_summer": { "channels": ["NBC", "USA Network", "CNBC", "MSNBC", "Golf Channel", "Olympic Channel"] },
+      "olympics_winter": { "channels": ["NBC", "USA Network", "CNBC", "MSNBC", "Olympic Channel"] }
+    },
+    "link": "https://tv.youtube.com",
+    "notes": "Includes local channels. NFL Sunday Ticket available as add-on."
+  },
+  {
+    "id": "hulu_live",
+    "name": "Hulu + Live TV",
+    "serviceCategory": "Live TV Streaming",
+    "price": "$76.99/mo",
+    "leagues": {
+      "nfl": { "channels": ["CBS", "FOX", "NBC", "ESPN", "NFL Network"] },
+      "nba": { "channels": ["ABC", "ESPN", "TNT"] },
+      "mlb": { "channels": ["FOX", "FS1", "ESPN", "TBS"] },
+      "nhl": { "channels": ["ESPN", "TNT"] },
+      "epl": { "channels": ["NBC", "USA Network"] },
+      "f1": { "channels": ["ESPN", "ESPN2", "ABC"] },
+      "laliga": { "channels": ["ESPN+", "ESPN", "ESPN Deportes"] },
+      "bundesliga": { "channels": ["ESPN+", "ESPN", "ESPN Deportes"] },
+      "ucl": { "channels": ["CBS (Finals via local affiliate if available)"] },
+      "fifa_wc": { "channels": ["FOX", "FS1"] },
+      "olympics_summer": { "channels": ["NBC", "USA Network", "CNBC", "MSNBC", "Golf Channel"] },
+      "olympics_winter": { "channels": ["NBC", "USA Network", "CNBC", "MSNBC"] }
+    },
+    "link": "https://www.hulu.com/live-tv",
+    "notes": "Includes Disney+ and ESPN+ (which has separate sports content)."
+  },
+  {
+    "id": "fubo",
+    "name": "FuboTV",
+    "serviceCategory": "Live TV Streaming",
+    "price": "$79.99/mo (Pro Plan)",
+    "leagues": {
+      "nfl": { "channels": ["CBS", "FOX", "NBC", "ESPN", "NFL Network", "Regional Sports Networks"] },
+      "nba": { "channels": ["ABC", "ESPN", "NBA TV (add-on/higher tier)", "Regional Sports Networks"] },
+      "mlb": { "channels": ["FOX", "FS1", "ESPN (select games)", "MLB Network (add-on)", "Regional Sports Networks"] },
+      "nhl": { "channels": ["ABC", "ESPN", "NHL Network (add-on)", "Regional Sports Networks"] },
+      "epl": { "channels": ["NBC", "USA Network", "CNBC", "Universo"] },
+      "f1": { "channels": ["ESPN", "ESPN2", "ABC"] },
+      "laliga": { "channels": ["ESPN", "ESPN Deportes", "beIN Sports (optional add-on)"] },
+      "bundesliga": { "channels": ["ESPN", "ESPN Deportes"] },
+      "seriea": { "channels": ["CBS Sports Network (via add-on)", "Paramount+ (often separate for full coverage)"] },
+      "ligue1": { "channels": ["beIN Sports (optional add-on)"] },
+      "ucl": { "channels": ["CBS Sports Network (select games)", "Univision/TUDN (select games)"] },
+      "uel": { "channels": ["CBS Sports Network (select games)", "Univision/TUDN (select games)"] },
+      "fifa_wc": { "channels": ["FOX", "FS1", "Telemundo", "Universo"] },
+      "olympics_summer": { "channels": ["NBC", "USA Network", "CNBC", "Universo", "Golf Channel"] },
+      "olympics_winter": { "channels": ["NBC", "USA Network", "CNBC", "Universo"] }
+    },
+    "link": "https://www.fubo.tv/",
+    "notes": "Strong focus on sports, includes many RSNs. No Turner channels (TNT, TBS)."
+  },
+  {
+    "id": "sling",
+    "name": "Sling TV (Orange + Blue)",
+    "serviceCategory": "Live TV Streaming",
+    "price": "$60.00/mo",
+    "leagues": {
+      "nfl": { "channels": ["FOX (Blue, select mkts)", "NBC (Blue, select mkts)", "ESPN (Orange)", "NFL Network (Blue + Sports Extra)"] },
+      "nba": { "channels": ["ESPN (Orange)", "TNT (Orange/Blue)", "NBA TV (Sports Extra)"] },
+      "mlb": { "channels": ["FS1 (Blue)", "ESPN (Orange)", "MLB Network (Sports Extra)", "TBS (Orange/Blue)"] },
+      "nhl": { "channels": ["TNT (Orange/Blue)", "NHL Network (Sports Extra)", "ESPN (Orange)"] },
+      "epl": { "channels": ["USA Network (Blue)", "NBC (Blue, select mkts)"] },
+      "f1": { "channels": ["ESPN (Orange)", "ESPN2 (Orange)"] },
+      "ligue1": { "channels": ["beIN Sports (Sports Extra or International Sports add-on)"] },
+      "fifa_wc": { "channels": ["FOX (Blue, select mkts)", "FS1 (Blue)"] },
+      "olympics_summer": { "channels": ["NBC (Blue, select mkts)", "USA Network (Blue)"] },
+      "olympics_winter": { "channels": ["NBC (Blue, select mkts)", "USA Network (Blue)"] }
+    },
+    "link": "https://www.sling.com/",
+    "notes": "A la carte style. Local channel access is limited. Sports Extra add-on often needed."
+  },
+  {
+    "id": "directv_stream",
+    "name": "DirecTV Stream",
+    "serviceCategory": "Live TV Streaming",
+    "price": "$79.99/mo (Entertainment) - $164.99/mo (Premier)",
+    "leagues": {
+      "nfl": { "channels": ["CBS", "FOX", "NBC", "ESPN", "NFL Network (Choice+)", "RSNs (Choice+)"] },
+      "nba": { "channels": ["ABC", "ESPN", "TNT", "NBA TV (Choice+)", "RSNs (Choice+)"] },
+      "mlb": { "channels": ["FOX", "FS1", "ESPN", "MLB Network (Choice+)", "TBS", "RSNs (Choice+)"] },
+      "nhl": { "channels": ["ABC", "ESPN", "TNT", "NHL Network (Ultimate+)", "RSNs (Choice+)"] },
+      "epl": { "channels": ["NBC", "USA Network", "CNBC"] },
+      "f1": { "channels": ["ESPN", "ESPN2", "ABC"] },
+      "laliga": { "channels": ["ESPN", "ESPN Deportes (Choice+)"] },
+      "bundesliga": { "channels": ["ESPN", "ESPN Deportes (Choice+)"] },
+      "fifa_wc": { "channels": ["FOX", "FS1", "Telemundo (Choice+)"] },
+      "olympics_summer": { "channels": ["NBC", "USA Network", "CNBC", "Golf Channel", "Olympic Channel (Choice+)"] },
+      "olympics_winter": { "channels": ["NBC", "USA Network", "CNBC", "Olympic Channel (Choice+)"] }
+    },
+    "link": "https://stream.directv.com/",
+    "notes": "Live TV streaming, includes RSNs in higher tiers. Choice package is good for sports."
+  },
+  {
+    "id": "espnp",
+    "name": "ESPN+",
+    "serviceCategory": "Sport Specific & Add-ons",
+    "price": "$10.99/mo",
+    "leagues": {
+      "nba": { "channels": ["Select out-of-market games", "ESPN+ exclusives"] },
+      "mlb": { "channels": ["Daily out-of-market games (blackouts apply)"] },
+      "nhl": { "channels": ["Extensive out-of-market games", "ESPN+ exclusives"] },
+      "f1": { "channels": ["Practice sessions", "Alternate feeds", "Race Replays (sometimes live simulcasts with ESPN linear)"] },
+      "laliga": { "channels": ["Most La Liga matches (English & Spanish)"] },
+      "bundesliga": { "channels": ["Most Bundesliga matches"] }
+    },
+    "link": "https://plus.espn.com/",
+    "notes": "Standalone streaming. Not a replacement for ESPN linear channels. Bundled with Hulu + Live TV."
+  },
+  {
+    "id": "paramount_plus",
+    "name": "Paramount+",
+    "serviceCategory": "Sport Specific & Add-ons",
+    "price": "$5.99/mo (Essential) / $11.99/mo (with Showtime)",
+    "leagues": {
+      "nfl": { "channels": ["CBS local & national games"] },
+      "ucl": { "channels": ["All UEFA Champions League matches (English)"] },
+      "uel": { "channels": ["All UEFA Europa League matches (English)"] },
+      "seriea": { "channels": ["All Serie A matches"] }
+    },
+    "link": "https://www.paramountplus.com/",
+    "notes": "Live NFL on CBS. Showtime bundle includes more movies/series."
+  },
+  {
+    "id": "peacock",
+    "name": "Peacock Premium",
+    "serviceCategory": "Sport Specific & Add-ons",
+    "price": "$5.99/mo",
+    "leagues": {
+      "nfl": { "channels": ["NBC Sunday Night Football simulcasts", "Exclusive games"] },
+      "mlb": { "channels": ["Exclusive Sunday Leadoff games"] },
+      "epl": { "channels": ["Exclusive Premier League matches (~175/season)", "NBC simulcasts", "Goal Rush"] },
+      "f1": { "channels": ["Select race simulcasts (often requires Pro tier for full season)"] },
+      "fifa_wc": { "channels": ["Telemundo/Universo simulcasts (Spanish language)"] },
+      "olympics_summer": { "channels": ["Extensive live coverage", "Full event replays", "NBC simulcasts"] },
+      "olympics_winter": { "channels": ["Extensive live coverage", "Full event replays", "NBC simulcasts"] }
+    },
+    "link": "https://www.peacocktv.com/",
+    "notes": "Content from NBCUniversal. Different tiers available."
+  },
+  {
+    "id": "apple",
+    "name": "Apple TV+",
+    "serviceCategory": "Sport Specific & Add-ons",
+    "price": "$9.99/mo (base)",
+    "leagues": {
+      "mlb": { "channels": ["Friday Night Baseball (select games, free with Apple TV+)"] },
+      "mls": { "channels": ["ALL MLS games (requires MLS Season Pass add-on - $14.99/mo or $99/season)"] }
+    },
+    "link": "https://tv.apple.com/",
+    "notes": "MLS Season Pass is a separate subscription for all MLS matches."
+  },
+  {
+    "id": "amazon_prime",
+    "name": "Amazon Prime Video",
+    "serviceCategory": "Sport Specific & Add-ons",
+    "price": "Included with Prime / $8.99/mo (Video only)",
+    "leagues": {
+      "nfl": { "channels": ["Thursday Night Football (exclusive)"] }
+    },
+    "link": "https://www.amazon.com/amazonprimevideo/",
+    "notes": "TNF is a key offering for NFL fans. Some sports content via Prime Video Channels (extra cost)."
+  },
+  {
+    "id": "f1tv_pro",
+    "name": "F1 TV Pro",
+    "serviceCategory": "League/Sport Specific",
+    "price": "$9.99/mo or $79.99/yr (approx)",
+    "leagues": {
+      "f1": { "channels": ["All F1 sessions live (FP, Quali, Race)", "Onboard cameras", "Data channels", "Archive"] }
+    },
+    "link": "https://f1tv.formula1.com/",
+    "notes": "The official F1 streaming service. Offers comprehensive F1 coverage."
+  },
+  {
+    "id": "max_br_sports",
+    "name": "Max (B/R Sports Add-On)",
+    "serviceCategory": "Sport Specific & Add-ons",
+    "price": "$9.99/mo (Add-on to Max subscription)",
+    "leagues": {
+      "nba": { "channels": ["Games on TNT", "NBA TV games (select)"] },
+      "nhl": { "channels": ["Games on TNT", "NHL Network games (select)"] },
+      "mlb": { "channels": ["Games on TBS"] }
+    },
+    "link": "https://www.max.com/",
+    "notes": "Sports add-on for Max. Carries games broadcast on Turner Sports networks."
+  },
+  {
+    "id": "mlbtv",
+    "name": "MLB.TV",
+    "serviceCategory": "League/Sport Specific",
+    "price": "$24.99/mo or $149.99/yr (All Teams, approx)",
+    "leagues": {
+      "mlb": { "channels": ["All out-of-market MLB games (blackouts apply for local teams)"] }
+    },
+    "link": "https://www.mlb.com/tv",
+    "notes": "Stream out-of-market MLB games. Local blackouts are a key factor."
+  },
+  {
+    "id": "nba_league_pass",
+    "name": "NBA League Pass",
+    "serviceCategory": "League/Sport Specific",
+    "price": "$14.99/mo or $99.99/yr (approx)",
+    "leagues": {
+      "nba": { "channels": ["All out-of-market NBA games (blackouts apply for local & national games)"] }
+    },
+    "link": "https://www.nba.com/leaguepass",
+    "notes": "Stream out-of-market NBA games. Local and national blackouts apply."
+  },
+  {
+    "id": "nfl_league_pass",
+    "name": "NFL League Pass",
+    "serviceCategory": "League/Sport Specific",
+    "price": "$14.99/mo or $99.99/yr (approx)",
+    "leagues": {
+      "nfl": { "channels": ["All out-of-market NFL games (blackouts apply for local teams)"] }
+    },
+    "link": "https://www.nfl.com/plus/league-pass",
+    "notes": "Stream out-of-market NFL games. Local blackouts are a key factor."
+  }
+]

@@ -1,0 +1,61 @@
+[
+  {
+    "categoryName": "American Football",
+    "icon": "🏈",
+    "leagues": [
+      { "id": "nfl", "name": "NFL", "icon": "🏈" },
+      { "id": "ncaafb", "name": "NCAA Football", "icon": "🏈" }
+    ]
+  },
+  {
+    "categoryName": "Basketball",
+    "icon": "🏀",
+    "leagues": [
+      { "id": "nba", "name": "NBA", "icon": "🏀" }
+    ]
+  },
+  {
+    "categoryName": "Baseball",
+    "icon": "⚾️",
+    "leagues": [
+      { "id": "mlb", "name": "MLB", "icon": "⚾️" }
+    ]
+  },
+  {
+    "categoryName": "Ice Hockey",
+    "icon": "🏒",
+    "leagues": [
+      { "id": "nhl", "name": "NHL", "icon": "🏒" }
+    ]
+  },
+  {
+    "categoryName": "Soccer",
+    "icon": "⚽️",
+    "leagues": [
+      { "id": "epl", "name": "Premier League (England)", "icon": "🇬🇧" },
+      { "id": "ucl", "name": "UEFA Champions League", "icon": "⭐" },
+      { "id": "mls", "name": "MLS", "icon": "⚽️" },
+      { "id": "laliga", "name": "La Liga (Spain)", "icon": "🇪🇸" },
+      { "id": "bundesliga", "name": "Bundesliga (Germany)", "icon": "🇩🇪" },
+      { "id": "seriea", "name": "Serie A (Italy)", "icon": "🇮🇹" },
+      { "id": "ligue1", "name": "Ligue 1 (France)", "icon": "🇫🇷" },
+      { "id": "uel", "name": "UEFA Europa League", "icon": "🏆" }
+    ]
+  },
+  {
+    "categoryName": "Motorsport",
+    "icon": "🏎️",
+    "leagues": [
+      { "id": "f1", "name": "Formula 1", "icon": "🏎️" }
+    ]
+  },
+  {
+    "categoryName": "Major Events",
+    "icon": "🌍",
+    "leagues": [
+      { "id": "fifa_wc", "name": "FIFA World Cup", "icon": "🏆🌍" },
+      { "id": "olympics_summer", "name": "Summer Olympics", "icon": "🥇" },
+      { "id": "olympics_winter", "name": "Winter Olympics", "icon": "❄️" }
+    ]
+  }
+]
