@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
-      <h2 class="text-xl sm:text-2xl font-semibold text-white mb-0">
+      <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 dark:text-white mb-0">
         Select Your Favorite Leagues
       </h2>
       <div class="flex justify-end space-x-3">
@@ -20,15 +20,15 @@
       </div>
     </div>
 
-    <div class="space-y-4 bg-slate-700/80 rounded-2xl  backdrop-blur-md p-4 sm:p-6 md:p-8">
-      <div v-for="category in store.allLeaguesByCategory" :key="category.categoryName" class="border border-slate-700/50 rounded-xl shadow-lg overflow-hidden bg-slate-800/80 backdrop-blur-sm">
+    <div class="space-y-4 bg-white/80 dark:bg-slate-700/80 rounded-2xl border border-slate-200 dark:border-slate-700/50 backdrop-blur-md p-4 sm:p-6 md:p-8">
+      <div v-for="category in store.allLeaguesByCategory" :key="category.categoryName" class="border border-slate-200 dark:border-slate-700/50 rounded-xl shadow-lg overflow-hidden bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm">
         <button
           @click="store.toggleCategoryExpansion(category.categoryName)"
-          class="w-full flex justify-between items-center p-3 sm:p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 hover:from-slate-700/50 hover:to-slate-600/50 transition-all duration-300 focus:outline-none"
+          class="w-full flex justify-between items-center p-3 sm:p-4 bg-gradient-to-r from-slate-50 to-slate-200 dark:from-slate-800/50 dark:to-slate-700/50 hover:from-slate-100 hover:to-slate-300 dark:hover:from-slate-700/50 dark:hover:to-slate-600/50 transition-all duration-300 focus:outline-none"
         >
           <div class="flex items-center">
             <span class="mr-2 text-xl">{{ category.icon || '🏆' }}</span>
-            <span class="font-semibold text-base sm:text-lg text-slate-200 break-words">{{ category.categoryName }}</span>
+            <span class="font-semibold text-base sm:text-lg text-slate-800 dark:text-slate-200 break-words">{{ category.categoryName }}</span>
           </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -49,21 +49,21 @@
           leave-from-class="transform opacity-100 translate-y-0 max-h-screen"
           leave-to-class="transform opacity-0 -translate-y-4 max-h-0"
         >
-          <div v-show="store.expandedCategories.includes(category.categoryName)" class="p-4 bg-slate-800/20">
+          <div v-show="store.expandedCategories.includes(category.categoryName)" class="p-4 bg-slate-50 dark:bg-slate-800/20">
             <div class="space-y-2">
               <button
                 v-for="league in category.leagues"
                 :key="league.id"
                 @click="store.toggleLeagueSelection(league.id)"
                 :class="[
-                  'w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 flex items-center justify-between shadow-sm hover:shadow-md',
+                  'w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-between shadow-sm hover:shadow-md',
                   store.selectedLeagueIds.includes(league.id)
-                    ? 'bg-gradient-to-r from-blue-500/20 to-indigo-600/20 text-white hover:from-blue-500/30 hover:to-indigo-600/30 focus:ring-blue-500 border border-blue-500/30'
-                    : 'bg-slate-700/30 text-slate-300 hover:bg-slate-700/50 focus:ring-slate-500 border border-slate-700/50'
+                    ? 'bg-gradient-to-r from-blue-200/40 to-indigo-200/40 text-blue-700 dark:from-blue-500/20 dark:to-indigo-600/20 dark:text-white hover:from-blue-200/60 hover:to-indigo-200/60 dark:hover:from-blue-500/30 dark:hover:to-indigo-600/30 focus:ring-blue-300 dark:focus:ring-blue-500 border border-blue-200 dark:border-blue-500/30'
+                    : 'bg-slate-100/60 text-slate-800 dark:bg-slate-700/30 dark:text-slate-300 hover:bg-slate-200/80 dark:hover:bg-slate-700/50 focus:ring-slate-300 dark:focus:ring-slate-500 border border-slate-200 dark:border-slate-700/50'
                 ]"
               >
                 <span>{{ league.name }}</span>
-                <span v-if="store.selectedLeagueIds.includes(league.id)" class="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full font-semibold border border-blue-500/30">Selected</span>
+                <span v-if="store.selectedLeagueIds.includes(league.id)" class="text-xs bg-blue-200 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 px-2 py-1 rounded-full font-semibold border border-blue-200 dark:border-blue-500/30">Selected</span>
               </button>
             </div>
           </div>

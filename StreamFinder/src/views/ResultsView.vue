@@ -142,63 +142,6 @@
         <p>&copy; {{ new Date().getFullYear() }} StreamFinder. All rights reserved.</p>
       </footer>
     </div>
-
-    <!-- Show Other Options section now outside the container, no background or border -->
-    <section v-if="otherOptions.length > 0" class="mt-12 flex flex-col items-center">
-      <button
-        @click="showOtherOptions = !showOtherOptions"
-        class="w-full max-w-xl flex justify-between items-center py-3.5 px-5 rounded-xl text-lg font-semibold text-slate-800 dark:text-slate-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-500 shadow-none border-none bg-transparent hover:bg-slate-100/60 dark:hover:bg-slate-800/40"
-      >
-        <span>{{ showOtherOptions ? 'Hide' : 'Show' }} Other Options ({{ otherOptions.length }})</span>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6 transition-transform duration-300" :class="{'rotate-180': showOtherOptions}">
-          <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-        </svg>
-      </button>
-      <transition
-        enter-active-class="transition-all ease-out duration-500 overflow-hidden"
-        enter-from-class="opacity-0 max-h-0"
-        enter-to-class="opacity-100 max-h-[5000px]"
-        leave-active-class="transition-all ease-in duration-300 overflow-hidden"
-        leave-from-class="opacity-100 max-h-[5000px]"
-        leave-to-class="opacity-0 max-h-0"
-      >
-        <div v-show="showOtherOptions" class="w-full max-w-5xl">
-          <div class="flex flex-wrap items-center gap-3 mb-6 mt-6 justify-center">
-            <label class="font-medium text-sm text-slate-800 dark:text-slate-300">Sort by:</label>
-            <select v-model="sortBy" class="border border-slate-200 dark:border-slate-700/50 rounded-lg px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-500 min-w-[120px]">
-              <option value="price">Price</option>
-              <option value="leagues">Leagues Covered</option>
-            </select>
-            <button @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'" class="ml-2 px-3 py-1.5 border border-slate-200 dark:border-slate-700/50 rounded-lg text-sm font-medium bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-200/80 dark:hover:bg-slate-700/50 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-500 flex items-center justify-center" aria-label="Toggle sort order">
-              <span v-if="sortOrder === 'asc'" class="inline-block">▲</span>
-              <span v-else class="inline-block">▼</span>
-            </button>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div v-for="item in sortedOtherOptions" :key="item.id" class="flex flex-col">
-              <StreamingServiceCard
-                v-if="item.type === 'bundle' && item.servicesInvolved.length === 1"
-                :service="item.servicesInvolved[0]"
-                :is-secondary-option="true"
-                class="flex-grow"
-              />
-              <BundleCard
-                v-else-if="item.type === 'bundle'"
-                :item="item"
-                :is-secondary-option="true"
-                class="flex-grow"
-              />
-              <StreamingServiceCard
-                v-else
-                :service="item"
-                :is-secondary-option="true"
-                class="flex-grow"
-              />
-            </div>
-          </div>
-        </div>
-      </transition>
-    </section>
   </div>
 </template>
 
@@ -208,6 +151,7 @@ import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
 import StreamingServiceCard from '@/components/StreamingServiceCard.vue';
 import BundleCard from '@/components/BundleCard.vue';
 import { useRouter } from 'vue-router';
+import { useTheme } from '@/composables/useTheme';
 
 const store = useStreamingStoreWithPersistence();
 const router = useRouter();
@@ -262,6 +206,8 @@ const resetEverything = () => {
   store.subscribedServiceIds = [];
   router.push('/');
 };
+
+useTheme();
 </script>
 
 <style scoped>

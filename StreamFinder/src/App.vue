@@ -1,6 +1,6 @@
 // src/App.vue
 <template>
-  <div id="app">
+  <div>
     <RouterView />
   </div>
 </template>
