@@ -147,10 +147,6 @@ const toggleChannelsVisibility = () => {
   channelsVisible.value = !channelsVisible.value;
 };
 
-const isSubscribedAndNotSecondary = computed(() => {
-  return props.service.isSubscribed && !props.isSecondaryOption;
-});
-
 const visitLink = computed(() => {
   if (props.service.isSubscribed) {
     return loginLinks[props.service.id] || serviceHomepages[props.service.id] || '';

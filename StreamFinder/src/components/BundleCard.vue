@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-xl shadow-lg p-5 md:p-6 mb-8 relative ring-1 flex flex-col"
+    class="rounded-xl shadow-lg p-3 sm:p-5 md:p-6 mb-8 relative ring-1 flex flex-col w-full"
     :class="[
       isPrimaryRecommendation && item.badge === 'Top Coverage' ? 'border-2 border-green-500 bg-green-50 ring-green-400' + (isMainPick ? ' md:shadow-2xl' : '') :
       isPrimaryRecommendation && item.badge === 'Best Value' ? 'border-2 border-teal-500 bg-teal-50 ring-teal-400' :
@@ -29,11 +29,11 @@
             }">
           {{ (item.badge === 'Top Coverage' || item.badge === 'Best Value') && isPrimaryRecommendation ? 'Recommended Bundle' : item.displayName }}
         </h3>
-        <div class="flex flex-wrap justify-center items-center gap-x-1.5 gap-y-1 p-2 rounded-md shadow-inner"
+        <div class="flex flex-wrap justify-center items-center gap-x-1.5 gap-y-2 p-2 rounded-md shadow-inner"
              :class="isPrimaryRecommendation && item.badge ? 'bg-white' : 'bg-gray-50'">
           <template v-for="(service) in item.servicesInvolved" :key="service.id">
             <span
-                  class="px-2 py-0.5 text-xs font-semibold rounded-full shadow-sm"
+                  class="px-2 py-1 text-xs sm:text-sm font-semibold rounded-full shadow-sm break-words"
                   :class="service.isSubscribed ?
                             (isPrimaryRecommendation && item.badge === 'Top Coverage' ? 'bg-green-100 text-green-700' : 'bg-indigo-100 text-indigo-700') :
                             'bg-gray-200 text-gray-700'">
@@ -59,14 +59,14 @@
              'border-teal-200': item.badge === 'Best Value' && isPrimaryRecommendation,
              'border-gray-200': !isPrimaryRecommendation || !item.badge
            }">
-        <p class="text-xs text-gray-500 mb-0.5">Total Monthly Cost {{ item.type === 'bundle' ? 'for this Bundle' : 'for this Service' }}:</p>
+        <p class="text-xs sm:text-sm text-gray-500 mb-0.5">Total Monthly Cost {{ item.type === 'bundle' ? 'for this Bundle' : 'for this Service' }}:</p>
         <div class="inline-flex items-center justify-center p-0.5 rounded-full bg-gradient-to-br"
              :class="{
                 'from-green-400 to-green-600': item.badge === 'Top Coverage' && isPrimaryRecommendation,
                 'from-teal-400 to-teal-600': item.badge === 'Best Value' && isPrimaryRecommendation,
                 'from-gray-400 to-gray-600': !isPrimaryRecommendation || !item.badge
              }">
-          <span class="px-3 py-1.5 bg-white text-xl md:text-2xl font-bold rounded-full shadow-inner"
+          <span class="px-3 py-1.5 bg-white text-lg sm:text-xl md:text-2xl font-bold rounded-full shadow-inner"
                 :class="{
                     'text-green-700': item.badge === 'Top Coverage' && isPrimaryRecommendation,
                     'text-teal-700': item.badge === 'Best Value' && isPrimaryRecommendation,
@@ -85,10 +85,10 @@
 
       <div v-if="item.badge === 'Top Coverage' && isPrimaryRecommendation && item.redundantSubscriptions && item.redundantSubscriptions.length > 0"
            class="my-3 p-3 bg-orange-50 border border-orange-200 rounded-lg shadow-sm">
-        <button @click="savingsVisible = !savingsVisible" class="w-full text-left focus:outline-none group block">
+        <button @click="savingsVisible = !savingsVisible" class="w-full text-left focus:outline-none group block min-h-[44px]">
           <div class="flex justify-between items-center">
             <h4 class="text-sm font-semibold text-orange-700 group-hover:text-orange-800">Potential Savings!</h4>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-orange-500 group-hover:text-orange-600 transition-transform duration-200" :class="{'rotate-180': savingsVisible}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 text-orange-500 group-hover:text-orange-600 transition-transform duration-200" :class="{'rotate-180': savingsVisible}">
               <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
             </svg>
           </div>
@@ -112,14 +112,14 @@
       <div class="grid md:grid-cols-2 gap-x-4 mb-3 items-center">
         <div>
           <h4 class="text-sm font-semibold text-gray-700 mb-0.5">Leagues Covered:</h4>
-          <p class="text-lg sm:text-xl font-bold text-gray-800">
+          <p class="text-lg sm:text-xl font-bold text-gray-800 break-words">
             {{ item.totalCoveredLeaguesCount }}
             <span class="text-xs sm:text-sm font-normal text-gray-600">of {{ store.selectedLeagueIds.length }}</span>
           </p>
         </div>
         <div v-if="isPrimaryRecommendation && item.badge === 'Top Coverage' && item.totalCoveredLeaguesCount < store.selectedLeagueIds.length" class="flex flex-col items-end justify-center w-full">
           <span class="text-sm font-semibold">Missing:</span>
-          <p class="text-lg sm:text-sm font-bold text-red-600 mt-0.5 text-right">
+          <p class="text-lg sm:text-sm font-bold text-red-600 mt-0.5 text-right break-words">
             <span v-for="(league, idx) in missingLeagues" :key="league.id">
               <span class="mr-1">{{ league.icon }}</span>{{ league.name }}<span v-if="idx < missingLeagues.length - 1">, </span>
             </span>
@@ -137,17 +137,17 @@
 
       <div v-if="item.type === 'bundle' && item.servicesInvolved.length > 0" class="mt-2 mb-auto">
         <h4 class="text-md font-semibold text-gray-700 mb-1.5">Services in this Bundle:</h4>
-        <ul class="list-none pl-0 space-y-1.5">
+        <ul class="list-none pl-0 space-y-2">
           <li v-for="service in item.servicesInvolved" :key="service.id"
-              class="p-2.5 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-sm border"
+              class="p-2 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center shadow-sm border gap-y-1"
               :class="service.isSubscribed
                         ? 'bg-white border-green-300'
                         : (isPrimaryRecommendation && item.badge === 'Top Coverage' ? 'bg-yellow-100 border-yellow-400' : 'bg-gray-100 border-gray-200')
                      "
           >
             <div>
-              <strong class="text-sm font-medium text-gray-800">{{ service.name }}</strong>
-              <span class="text-xs block sm:inline sm:ml-1 text-gray-500">({{ service.price }})</span>
+              <strong class="text-sm sm:text-base font-medium text-gray-800 break-words">{{ service.name }}</strong>
+              <span class="text-xs sm:text-sm block sm:inline sm:ml-1 text-gray-500">({{ service.price }})</span>
               <span v-if="service.isSubscribed" class="text-xs font-bold ml-1 text-green-600">(Subscribed)</span>
               <span v-if="!service.isSubscribed && isPrimaryRecommendation && item.badge === 'Top Coverage'" class="text-xs font-bold ml-1 text-yellow-700">(New in this bundle)</span>
             </div>
@@ -155,7 +155,7 @@
               :href="getServiceLink(service)"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-xs mt-1.5 sm:mt-0 bg-blue-500 text-white hover:bg-blue-600 font-medium py-1 px-2.5 rounded-lg transition-colors duration-150 whitespace-nowrap"
+              class="text-xs sm:text-sm mt-1.5 sm:mt-0 bg-blue-500 text-white hover:bg-blue-600 font-medium py-2 px-3 rounded-lg transition-colors duration-150 whitespace-nowrap min-h-[44px] min-w-[44px]"
             >
               Visit {{ service.name }} &rarr;
             </a>
@@ -180,10 +180,10 @@
         </button>
         <transition name="fade-slide">
           <div v-show="channelsVisible">
-            <ul class="list-none pl-0 space-y-1.5 text-xs">
+            <ul class="list-none pl-0 space-y-1.5 text-xs sm:text-sm">
               <li v-for="(leagueData, leagueId) in item.selectedLeaguesCoveredDetails" :key="leagueId" class="p-2 bg-gray-50 rounded shadow-sm">
                 <div class="flex items-center mb-0.5">
-                  <span class="mr-1.5 text-lg w-6 text-center">{{ leagueData.icon }}</span>
+                  <span class="mr-1.5 text-lg sm:text-xl w-6 text-center">{{ leagueData.icon }}</span>
                   <strong class="text-gray-700">{{ leagueData.name }}:</strong>
                 </div>
                 <p class="ml-8 text-xs text-gray-500 leading-snug">
