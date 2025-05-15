@@ -152,8 +152,7 @@
               <span v-if="!service.isSubscribed && isPrimaryRecommendation && item.badge === 'Top Coverage'" class="text-xs font-bold ml-1 text-yellow-700">(New in this bundle)</span>
             </div>
             <a
-              v-if="!service.isSubscribed"
-              :href="service.link"
+              :href="getServiceLink(service)"
               target="_blank"
               rel="noopener noreferrer"
               class="text-xs mt-1.5 sm:mt-0 bg-blue-500 text-white hover:bg-blue-600 font-medium py-1 px-2.5 rounded-lg transition-colors duration-150 whitespace-nowrap"
@@ -203,6 +202,9 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useStreamingStore } from '@/stores/streamingStore';
+import affiliateLinks from '@/data/affiliateLinks.json';
+import loginLinks from '@/data/loginLinks.json';
+import serviceHomepages from '@/data/serviceHomepages.json';
 
 const store = useStreamingStore();
 
@@ -233,6 +235,14 @@ const missingLeagues = computed(() => {
   const coveredIds = Object.keys(props.item.selectedLeaguesCoveredDetails || {});
   return store.selectedLeagues.filter(l => !coveredIds.includes(l.id));
 });
+
+const getServiceLink = (service) => {
+  if (service.isSubscribed) {
+    return loginLinks[service.id] || serviceHomepages[service.id] || '';
+  } else {
+    return affiliateLinks[service.id] || serviceHomepages[service.id] || '';
+  }
+};
 
 const toggleChannelsVisibility = () => {
   channelsVisible.value = !channelsVisible.value;
