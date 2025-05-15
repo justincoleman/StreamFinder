@@ -41,7 +41,7 @@
         </div>
       </header>
 
-      <main class="bg-slate-800/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700/50">
+      <main class="bg-slate-700/80 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700/50">
         <LeagueSelector />
 
         <div class="mt-10 text-center">

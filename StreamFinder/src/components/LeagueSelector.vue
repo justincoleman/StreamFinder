@@ -1,25 +1,27 @@
 <template>
   <div>
-    <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-white">
-      Select Your Favorite Leagues
-    </h2>
-    <div class="mb-6 flex justify-end space-x-3">
-      <button
-        @click="store.selectAllLeagues()"
-        class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-150 min-h-[44px] min-w-[44px]"
-      >
-        Select All Leagues
-      </button>
-      <button
-        @click="store.unselectAllLeagues()"
-        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors duration-150 min-h-[44px] min-w-[44px]"
-      >
-        Unselect All
-      </button>
+    <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+      <h2 class="text-xl sm:text-2xl font-semibold text-white mb-0">
+        Select Your Favorite Leagues
+      </h2>
+      <div class="flex justify-end space-x-3">
+        <button
+          @click="store.selectAllLeagues()"
+          class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-150 min-h-[44px] min-w-[44px]"
+        >
+          Select All Leagues
+        </button>
+        <button
+          @click="store.unselectAllLeagues()"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors duration-150 min-h-[44px] min-w-[44px]"
+        >
+          Unselect All
+        </button>
+      </div>
     </div>
 
-    <div class="space-y-4">
-      <div v-for="category in store.allLeaguesByCategory" :key="category.categoryName" class="border border-slate-700/50 rounded-xl shadow-lg overflow-hidden bg-slate-800/30 backdrop-blur-sm">
+    <div class="space-y-4 bg-slate-700/80 rounded-2xl  backdrop-blur-md p-4 sm:p-6 md:p-8">
+      <div v-for="category in store.allLeaguesByCategory" :key="category.categoryName" class="border border-slate-700/50 rounded-xl shadow-lg overflow-hidden bg-slate-800/80 backdrop-blur-sm">
         <button
           @click="store.toggleCategoryExpansion(category.categoryName)"
           class="w-full flex justify-between items-center p-3 sm:p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 hover:from-slate-700/50 hover:to-slate-600/50 transition-all duration-300 focus:outline-none"

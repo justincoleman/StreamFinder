@@ -13,7 +13,7 @@
           <div class="mt-6">
             <router-link
                 to="/select-subscriptions"
-                class="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md border border-slate-600/50"
+                class="inline-flex items-center px-4 py-2 text-base font-medium text-white bg-slate-600/80 hover:bg-slate-500 border border-white/20 rounded-lg shadow transition-all duration-200"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-2">
                 <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />

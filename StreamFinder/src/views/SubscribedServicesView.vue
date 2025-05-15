@@ -10,9 +10,9 @@
         </div>
       </header>
 
-      <main class="bg-slate-800/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-700/50">
+      <main class="bg-slate-700/80 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-2xl">
         <div class="flex justify-between items-center mb-8">
-          <router-link to="/" class="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md border border-slate-600/50">
+          <router-link to="/" class="inline-flex items-center px-4 py-2 text-base font-medium text-white bg-slate-600/80 hover:bg-slate-500 border border-white/20 rounded-lg shadow transition-all duration-200">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-2">
               <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
             </svg>
@@ -33,55 +33,56 @@
             </button>
           </div>
         </div>
-
-        <div class="space-y-4">
-          <div v-for="category in store.allServicesGroupedByCategory" :key="category.categoryName" class="border border-slate-700/50 rounded-xl shadow-lg overflow-hidden bg-slate-800/30 backdrop-blur-sm">
-            <button
-              @click="store.toggleServiceCategoryExpansion(category.categoryName)"
-              class="w-full flex justify-between items-center p-3 sm:p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 hover:from-slate-700/50 hover:to-slate-600/50 transition-all duration-300 focus:outline-none"
-            >
-              <div class="flex items-center">
-                <span class="text-2xl mr-3">{{ category.icon }}</span>
-                <span class="font-semibold text-lg text-slate-200">{{ category.categoryName }}</span>
-              </div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                class="w-6 h-6 text-slate-400 transition-transform duration-300"
-                :class="{'rotate-180': store.expandedServiceCategories.includes(category.categoryName)}"
+        <div class="space-y-4 bg-slate-700/80 rounded-2xl  backdrop-blur-md p-4 sm:p-6 md:p-8">
+          <div class="space-y-4">
+            <div v-for="category in store.allServicesGroupedByCategory" :key="category.categoryName" class="border border-slate-700/50 rounded-xl shadow-lg overflow-hidden bg-slate-800/80 backdrop-blur-sm">
+              <button
+                @click="store.toggleServiceCategoryExpansion(category.categoryName)"
+                class="w-full flex justify-between items-center p-3 sm:p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 hover:from-slate-700/50 hover:to-slate-600/50 transition-all duration-300 focus:outline-none"
               >
-                <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <transition
-              enter-active-class="transition ease-out duration-300"
-              enter-from-class="transform opacity-0 -translate-y-4 max-h-0"
-              enter-to-class="transform opacity-100 translate-y-0 max-h-screen"
-              leave-active-class="transition ease-in duration-200"
-              leave-from-class="transform opacity-100 translate-y-0 max-h-screen"
-              leave-to-class="transform opacity-0 -translate-y-4 max-h-0"
-            >
-              <div v-show="store.expandedServiceCategories.includes(category.categoryName)" class="p-4 bg-slate-800/20">
-                <div class="space-y-2">
-                  <button
-                    v-for="service in category.services"
-                    :key="service.id"
-                    @click="store.toggleServiceSubscription(service.id)"
-                    :class="[
-                      'w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 flex items-center justify-between shadow-sm hover:shadow-md',
-                      store.subscribedServiceIds.includes(service.id)
-                        ? 'bg-gradient-to-r from-indigo-500/20 to-blue-600/20 text-white hover:from-indigo-500/30 hover:to-blue-600/30 focus:ring-indigo-500 border border-indigo-500/30'
-                        : 'bg-slate-700/30 text-slate-300 hover:bg-slate-700/50 focus:ring-slate-500 border border-slate-700/50'
-                    ]"
-                  >
-                    <span>{{ service.name }}</span>
-                    <span v-if="store.subscribedServiceIds.includes(service.id)" class="text-xs bg-indigo-500/20 text-indigo-300 px-2 py-1 rounded-full font-semibold border border-indigo-500/30">Subscribed</span>
-                  </button>
+                <div class="flex items-center">
+                  <span class="text-2xl mr-3">{{ category.icon }}</span>
+                  <span class="font-semibold text-lg text-slate-200">{{ category.categoryName }}</span>
                 </div>
-              </div>
-            </transition>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  class="w-6 h-6 text-slate-400 transition-transform duration-300"
+                  :class="{'rotate-180': store.expandedServiceCategories.includes(category.categoryName)}"
+                >
+                  <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                </svg>
+              </button>
+
+              <transition
+                enter-active-class="transition ease-out duration-300"
+                enter-from-class="transform opacity-0 -translate-y-4 max-h-0"
+                enter-to-class="transform opacity-100 translate-y-0 max-h-screen"
+                leave-active-class="transition ease-in duration-200"
+                leave-from-class="transform opacity-100 translate-y-0 max-h-screen"
+                leave-to-class="transform opacity-0 -translate-y-4 max-h-0"
+              >
+                <div v-show="store.expandedServiceCategories.includes(category.categoryName)" class="p-4 bg-slate-800/20">
+                  <div class="space-y-2">
+                    <button
+                      v-for="service in category.services"
+                      :key="service.id"
+                      @click="store.toggleServiceSubscription(service.id)"
+                      :class="[
+                        'w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 flex items-center justify-between shadow-sm hover:shadow-md',
+                        store.subscribedServiceIds.includes(service.id)
+                          ? 'bg-gradient-to-r from-indigo-500/20 to-blue-600/20 text-white hover:from-indigo-500/30 hover:to-blue-600/30 focus:ring-indigo-500 border border-indigo-500/30'
+                          : 'bg-slate-700/30 text-slate-300 hover:bg-slate-700/50 focus:ring-slate-500 border border-slate-700/50'
+                      ]"
+                    >
+                      <span>{{ service.name }}</span>
+                      <span v-if="store.subscribedServiceIds.includes(service.id)" class="text-xs bg-indigo-500/20 text-indigo-300 px-2 py-1 rounded-full font-semibold border border-indigo-500/30">Subscribed</span>
+                    </button>
+                  </div>
+                </div>
+              </transition>
+            </div>
           </div>
         </div>
 
