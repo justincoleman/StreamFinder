@@ -4,14 +4,15 @@
     "icon": "🏈",
     "leagues": [
       { "id": "nfl", "name": "NFL", "icon": "🏈" },
-      { "id": "ncaafb", "name": "NCAA Football", "icon": "🏈" }
+      { "id": "ncaa_football", "name": "NCAA Football", "icon": "🏈" }
     ]
   },
   {
     "categoryName": "Basketball",
     "icon": "🏀",
     "leagues": [
-      { "id": "nba", "name": "NBA", "icon": "🏀" }
+      { "id": "nba", "name": "NBA", "icon": "🏀" },
+      { "id": "ncaa_basketball", "name": "NCAA Basketball", "icon": "🏟️" }
     ]
   },
   {
@@ -32,13 +33,13 @@
     "categoryName": "Soccer",
     "icon": "⚽️",
     "leagues": [
-      { "id": "epl", "name": "Premier League (England)", "icon": "🇬🇧" },
-      { "id": "ucl", "name": "UEFA Champions League", "icon": "⭐" },
       { "id": "mls", "name": "MLS", "icon": "⚽️" },
+      { "id": "epl", "name": "Premier League (England)", "icon": "🇬🇧" },
       { "id": "laliga", "name": "La Liga (Spain)", "icon": "🇪🇸" },
       { "id": "bundesliga", "name": "Bundesliga (Germany)", "icon": "🇩🇪" },
       { "id": "seriea", "name": "Serie A (Italy)", "icon": "🇮🇹" },
       { "id": "ligue1", "name": "Ligue 1 (France)", "icon": "🇫🇷" },
+      { "id": "ucl", "name": "UEFA Champions League", "icon": "⭐" },
       { "id": "uel", "name": "UEFA Europa League", "icon": "🏆" }
     ]
   },
