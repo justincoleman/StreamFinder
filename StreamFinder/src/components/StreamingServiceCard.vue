@@ -28,14 +28,14 @@
       v-if="service.isSubscribed && isSecondaryOption"
       class="absolute top-2 right-2 text-green-700 text-xs font-medium p-1 bg-green-100 rounded"
     >
-      (Subscribed)
+      ✓ Subscribed
     </div>
 
 
     <div class="flex flex-col sm:flex-row justify-between sm:items-start mb-3 pt-4">
       <h3 class="text-xl font-bold mb-2 sm:mb-0"
           :class="[
-            isMainPick ? 'md:text-2xl' : 'md:text-xl',
+            isMainPick ? 'md:text-2xl' : 'md:text-lg',
             {'text-green-700': service.isSubscribed && !isSecondaryOption && !service.badge},
             {'text-teal-700': service.badge === 'Best Value' && isPrimaryRecommendation},
             {'text-blue-700': !service.isSubscribed && !service.badge && !isSecondaryOption},
@@ -47,19 +47,19 @@
         :href="visitLink"
         target="_blank"
         rel="noopener noreferrer"
-        class="text-sm bg-blue-500 text-white hover:bg-blue-600 font-medium py-2 px-4 rounded-lg transition-colors duration-150 inline-block sm:inline whitespace-nowrap mt-2 sm:mt-0"
+        class="text-xs bg-blue-500 text-white hover:bg-blue-600 font-medium py-1 px-2 rounded-lg transition-colors duration-150 inline-block sm:inline whitespace-nowrap mt-2 sm:mt-0"
       >
         Visit Site →
       </a>
     </div>
 
-    <p class="text-md sm:text-lg text-gray-700 mb-1 pb-3 border-b"
+    <p class="text-md sm:text-md text-gray-700 mb-1 pb-3 border-b"
        :class="{
          'border-green-200': service.isSubscribed && !isSecondaryOption && !service.badge,
          'border-teal-200': service.badge === 'Best Value' && isPrimaryRecommendation,
          'border-gray-200': !isPrimaryRecommendation || !service.badge || isSecondaryOption
        }">
-      <span class="font-semibold">Price:</span>
+      <span class="font-semibold">Price: </span>
       <span v-if="service.isSubscribed && !isSecondaryOption" class="text-green-600 font-bold">$0.00 (Already Subscribed)</span>
       <span v-else-if="service.isSubscribed && isSecondaryOption" class="text-gray-600">{{ service.originalService ? service.originalService.price : (service.numericPrice !== Infinity ? service.numericPrice.toFixed(2) : 'N/A') }} <span class="text-xs">(Subscribed)</span></span>
       <span v-else>{{ service.originalService ? service.originalService.price : (service.numericPrice !== Infinity ? service.numericPrice.toFixed(2) : 'N/A') }}</span>

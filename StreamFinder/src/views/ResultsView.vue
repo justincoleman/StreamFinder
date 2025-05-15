@@ -88,26 +88,39 @@
             leave-from-class="opacity-100 max-h-[5000px]"
             leave-to-class="opacity-0 max-h-0"
           >
-            <div v-show="showOtherOptions" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div v-for="item in otherOptions" :key="item.id" class="flex flex-col">
-                <StreamingServiceCard
-                  v-if="item.type === 'bundle' && item.servicesInvolved.length === 1"
-                  :service="item.servicesInvolved[0]"
-                  :is-secondary-option="true"
-                  class="flex-grow"
-                />
-                <BundleCard
-                  v-else-if="item.type === 'bundle'"
-                  :item="item"
-                  :is-secondary-option="true"
-                  class="flex-grow"
-                />
-                <StreamingServiceCard
-                  v-else
-                  :service="item"
-                  :is-secondary-option="true"
-                  class="flex-grow"
-                />
+            <div v-show="showOtherOptions">
+              <div class="flex flex-wrap items-center gap-3 mb-6 mt-6 justify-center">
+                <label class="font-medium text-sm text-gray-700">Sort by:</label>
+                <select v-model="sortBy" class="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 min-w-[120px]">
+                  <option value="price">Price</option>
+                  <option value="leagues">Leagues Covered</option>
+                </select>
+                <button @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'" class="ml-2 px-2 py-1 border rounded text-sm font-medium bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center justify-center" aria-label="Toggle sort order">
+                  <span v-if="sortOrder === 'asc'" class="inline-block">▲</span>
+                  <span v-else class="inline-block">▼</span>
+                </button>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div v-for="item in sortedOtherOptions" :key="item.id" class="flex flex-col">
+                  <StreamingServiceCard
+                    v-if="item.type === 'bundle' && item.servicesInvolved.length === 1"
+                    :service="item.servicesInvolved[0]"
+                    :is-secondary-option="true"
+                    class="flex-grow"
+                  />
+                  <BundleCard
+                    v-else-if="item.type === 'bundle'"
+                    :item="item"
+                    :is-secondary-option="true"
+                    class="flex-grow"
+                  />
+                  <StreamingServiceCard
+                    v-else
+                    :service="item"
+                    :is-secondary-option="true"
+                    class="flex-grow"
+                  />
+                </div>
               </div>
             </div>
           </transition>
@@ -133,6 +146,8 @@ import BundleCard from '@/components/BundleCard.vue'; // Assuming correct path
 
 const store = useStreamingStore();
 const showOtherOptions = ref(false);
+const sortBy = ref('price'); // 'price' or 'leagues'
+const sortOrder = ref('asc'); // 'asc' or 'desc'
 const allFilteredItems = computed(() => store.getFilteredServices);
 
 const topCoveragePick = computed(() => {
@@ -152,6 +167,24 @@ const topPicks = computed(() => {
 const otherOptions = computed(() => {
   const topPickIds = new Set(topPicks.value.map(pick => pick.id));
   return allFilteredItems.value.filter(item => !topPickIds.has(item.id));
+});
+
+const sortedOtherOptions = computed(() => {
+  const arr = [...otherOptions.value];
+  arr.sort((a, b) => {
+    let aVal, bVal;
+    if (sortBy.value === 'price') {
+      aVal = a.totalNumericPrice ?? a.numericPrice ?? Infinity;
+      bVal = b.totalNumericPrice ?? b.numericPrice ?? Infinity;
+    } else if (sortBy.value === 'leagues') {
+      aVal = a.totalCoveredLeaguesCount ?? (a.selectedLeaguesCoveredDetails ? Object.keys(a.selectedLeaguesCoveredDetails).length : 0);
+      bVal = b.totalCoveredLeaguesCount ?? (b.selectedLeaguesCoveredDetails ? Object.keys(b.selectedLeaguesCoveredDetails).length : 0);
+    }
+    if (aVal < bVal) return sortOrder.value === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortOrder.value === 'asc' ? 1 : -1;
+    return 0;
+  });
+  return arr;
 });
 
 const selectedLeagueNames = computed(() => {
