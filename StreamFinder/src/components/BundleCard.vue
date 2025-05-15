@@ -109,15 +109,25 @@
         </transition>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-x-4 mb-3">
+      <div class="grid md:grid-cols-2 gap-x-4 mb-3 items-center">
         <div>
-            <h4 class="text-sm font-semibold text-gray-700 mb-0.5">Leagues Covered:</h4>
-            <p class="text-lg sm:text-xl font-bold text-gray-800">
+          <h4 class="text-sm font-semibold text-gray-700 mb-0.5">Leagues Covered:</h4>
+          <p class="text-lg sm:text-xl font-bold text-gray-800">
             {{ item.totalCoveredLeaguesCount }}
             <span class="text-xs sm:text-sm font-normal text-gray-600">of {{ store.selectedLeagueIds.length }}</span>
-            </p>
+          </p>
         </div>
-        <div v-if="item.type === 'bundle' && Object.keys(item.newlyCoveredLeaguesDetails || {}).length > 0">
+        <div v-if="isPrimaryRecommendation && item.badge === 'Top Coverage' && item.totalCoveredLeaguesCount < store.selectedLeagueIds.length" class="flex flex-col items-end justify-center w-full">
+          <span class="text-sm font-semibold">Missing:</span>
+          <p class="text-lg sm:text-sm font-bold text-red-600 mt-0.5 text-right">
+            <span v-for="(league, idx) in missingLeagues" :key="league.id">
+              <span class="mr-1">{{ league.icon }}</span>{{ league.name }}<span v-if="idx < missingLeagues.length - 1">, </span>
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <div v-if="item.type === 'bundle' && Object.keys(item.newlyCoveredLeaguesDetails || {}).length > 0">
             <h4 class="text-sm font-semibold text-gray-700 mb-0.5">Newly Added:</h4>
             <p class="text-lg sm:text-xl font-bold text-blue-600">
                 {{ Object.keys(item.newlyCoveredLeaguesDetails).length }} <span class="text-xs sm:text-sm font-normal text-gray-600">Leagues</span>
@@ -188,7 +198,6 @@
         </transition>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -218,6 +227,12 @@ const props = defineProps({
 
 const channelsVisible = ref(false);
 const savingsVisible = ref(false);
+
+const missingLeagues = computed(() => {
+  // Find selected leagues that are not in the bundle's covered leagues
+  const coveredIds = Object.keys(props.item.selectedLeaguesCoveredDetails || {});
+  return store.selectedLeagues.filter(l => !coveredIds.includes(l.id));
+});
 
 const toggleChannelsVisibility = () => {
   channelsVisible.value = !channelsVisible.value;
