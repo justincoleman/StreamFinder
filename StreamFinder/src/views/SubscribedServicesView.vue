@@ -108,10 +108,10 @@
 
 <script setup>
 import { computed, onMounted } from 'vue';
-import { useStreamingStore } from '@/stores/streamingStore';
+import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
 import { useRouter } from 'vue-router';
 
-const store = useStreamingStore();
+const store = useStreamingStoreWithPersistence();
 const router = useRouter();
 
 onMounted(() => {

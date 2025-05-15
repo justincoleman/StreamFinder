@@ -140,11 +140,11 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { useStreamingStore } from '@/stores/streamingStore'; // Assuming your store file is named streamingStore.js
+import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
 import StreamingServiceCard from '@/components/StreamingServiceCard.vue'; // Assuming correct path
 import BundleCard from '@/components/BundleCard.vue'; // Assuming correct path
 
-const store = useStreamingStore();
+const store = useStreamingStoreWithPersistence();
 const showOtherOptions = ref(false);
 const sortBy = ref('price'); // 'price' or 'leagues'
 const sortOrder = ref('asc'); // 'asc' or 'desc'

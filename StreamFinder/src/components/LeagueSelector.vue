@@ -80,9 +80,9 @@
 
 <script setup>
 import { computed, onMounted } from 'vue';
-import { useStreamingStore } from '@/stores/streamingStore';
+import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
 
-const store = useStreamingStore();
+const store = useStreamingStoreWithPersistence();
 
 const selectedLeagueNames = computed(() => {
   return store.selectedLeagues.map(league => league.name).join(', ');

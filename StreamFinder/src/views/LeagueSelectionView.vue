@@ -34,10 +34,10 @@
 
 <script setup>
 import LeagueSelector from '@/components/LeagueSelector.vue';
-import { useStreamingStore } from '@/stores/streamingStore';
+import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
 import { useRouter } from 'vue-router';
 
-const store = useStreamingStore();
+const store = useStreamingStoreWithPersistence();
 const router = useRouter();
 
 const navigateToSelectSubscriptions = () => { // Renamed function

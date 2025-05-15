@@ -1,6 +1,7 @@
 // src/stores/streamingStore.js
 import { defineStore } from 'pinia';
 import allServicesData from '@/data/streamingServicesData.json';
+import { watch } from 'vue';
 
 // Helper function to parse price string to a number
 function parsePrice(priceString) {
@@ -430,4 +431,37 @@ export const useStreamingStore = defineStore('streaming', {
       this.subscribedServiceIds = [];
     }
   },
+
+  // LocalStorage persistence (Pinia plugin style)
+  persist: false,
 });
+
+// --- LocalStorage Persistence ---
+const LS_LEAGUES = 'sf_selectedLeagueIds';
+const LS_SERVICES = 'sf_subscribedServiceIds';
+
+function hydrateStoreFromLocalStorage(store) {
+  try {
+    const leagues = JSON.parse(localStorage.getItem(LS_LEAGUES));
+    if (Array.isArray(leagues)) store.selectedLeagueIds = leagues;
+    const services = JSON.parse(localStorage.getItem(LS_SERVICES));
+    if (Array.isArray(services)) store.subscribedServiceIds = services;
+  } catch (e) { /* ignore */ }
+}
+
+function setupLocalStoragePersistence(store) {
+  watch(() => store.selectedLeagueIds, (val) => {
+    localStorage.setItem(LS_LEAGUES, JSON.stringify(val));
+  }, { deep: true });
+  watch(() => store.subscribedServiceIds, (val) => {
+    localStorage.setItem(LS_SERVICES, JSON.stringify(val));
+  }, { deep: true });
+}
+
+// Pinia plugin for localStorage persistence
+export function useStreamingStoreWithPersistence() {
+  const store = useStreamingStore();
+  hydrateStoreFromLocalStorage(store);
+  setupLocalStoragePersistence(store);
+  return store;
+}

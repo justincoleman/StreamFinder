@@ -201,12 +201,12 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useStreamingStore } from '@/stores/streamingStore';
+import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
 import affiliateLinks from '@/data/affiliateLinks.json';
 import loginLinks from '@/data/loginLinks.json';
 import serviceHomepages from '@/data/serviceHomepages.json';
 
-const store = useStreamingStore();
+const store = useStreamingStoreWithPersistence();
 
 const props = defineProps({
   item: {
