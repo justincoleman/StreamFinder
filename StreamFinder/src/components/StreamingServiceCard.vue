@@ -44,7 +44,7 @@
         {{ service.name || service.displayName }}
       </h3>
       <a
-        :href="service.link"
+        :href="visitLink"
         target="_blank"
         rel="noopener noreferrer"
         class="text-sm bg-blue-500 text-white hover:bg-blue-600 font-medium py-2 px-4 rounded-lg transition-colors duration-150 inline-block sm:inline whitespace-nowrap mt-2 sm:mt-0"
@@ -118,6 +118,9 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import affiliateLinks from '@/data/affiliateLinks.json';
+import loginLinks from '@/data/loginLinks.json';
+import serviceHomepages from '@/data/serviceHomepages.json';
 
 const props = defineProps({
   service: {
@@ -146,5 +149,13 @@ const toggleChannelsVisibility = () => {
 
 const isSubscribedAndNotSecondary = computed(() => {
   return props.service.isSubscribed && !props.isSecondaryOption;
+});
+
+const visitLink = computed(() => {
+  if (props.service.isSubscribed) {
+    return loginLinks[props.service.id] || serviceHomepages[props.service.id] || '';
+  } else {
+    return affiliateLinks[props.service.id] || serviceHomepages[props.service.id] || '';
+  }
 });
 </script>

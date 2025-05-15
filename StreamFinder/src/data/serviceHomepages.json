@@ -1,0 +1,17 @@
+{
+  "ytv": "https://tv.youtube.com",
+  "hulu_live": "https://www.hulu.com/live-tv",
+  "fubo": "https://www.fubo.tv/",
+  "sling": "https://www.sling.com/",
+  "directv_stream": "https://stream.directv.com/",
+  "espnp": "https://plus.espn.com/",
+  "paramount_plus": "https://www.paramountplus.com/",
+  "peacock": "https://www.peacocktv.com/",
+  "apple": "https://tv.apple.com/",
+  "amazon_prime": "https://www.amazon.com/amazonprimevideo/",
+  "f1tv_pro": "https://f1tv.formula1.com/",
+  "max_br_sports": "https://www.max.com/",
+  "mlbtv": "https://www.mlb.com/tv",
+  "nba_league_pass": "https://www.nba.com/leaguepass",
+  "nfl_league_pass": "https://www.nfl.com/plus/league-pass"
+}
