@@ -8,34 +8,50 @@ function parsePrice(priceString) {
   if (!priceString || typeof priceString !== 'string') {
     return Infinity;
   }
-  const match = priceString.match(/[\d\.]+/);
+  const match = priceString.match(/[\d.]+/);
   return match ? parseFloat(match[0]) : Infinity;
 }
 
-// Helper to calculate unique covered leagues for a set of services
-function getBundleCoverageDetails(servicesInBundle, selectedLeagueIds, allLeaguesFlat) {
-  const coveredLeaguesSet = new Set();
-  const coveredLeaguesDetails = {};
+// Memoized helper to calculate unique covered leagues for a set of services
+const getBundleCoverageDetails = (() => {
+  const cache = new Map();
 
-  servicesInBundle.forEach(service => {
-    selectedLeagueIds.forEach(leagueId => {
-      if (service.leagues && service.leagues[leagueId]) {
-        coveredLeaguesSet.add(leagueId);
-        const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
-        if (!coveredLeaguesDetails[leagueId]) {
-          coveredLeaguesDetails[leagueId] = {
-            name: leagueInfo ? leagueInfo.name : leagueId,
-            icon: leagueInfo ? leagueInfo.icon : '?',
-            channels: [],
-          };
-        }
-        const serviceChannels = service.leagues[leagueId].channels.map(ch => `${ch} (on ${service.name})`);
-        coveredLeaguesDetails[leagueId].channels = [...new Set([...(coveredLeaguesDetails[leagueId].channels || []), ...serviceChannels])];
-      }
+  return (servicesInBundle, selectedLeagueIds, allLeaguesFlat) => {
+    const cacheKey = JSON.stringify({
+      services: servicesInBundle.map(s => s.id).sort(),
+      leagues: selectedLeagueIds.sort()
     });
-  });
-  return { count: coveredLeaguesSet.size, details: coveredLeaguesDetails };
-}
+
+    if (cache.has(cacheKey)) {
+      return cache.get(cacheKey);
+    }
+
+    const coveredLeaguesSet = new Set();
+    const coveredLeaguesDetails = {};
+
+    servicesInBundle.forEach(service => {
+      selectedLeagueIds.forEach(leagueId => {
+        if (service.leagues && service.leagues[leagueId]) {
+          coveredLeaguesSet.add(leagueId);
+          const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
+          if (!coveredLeaguesDetails[leagueId]) {
+            coveredLeaguesDetails[leagueId] = {
+              name: leagueInfo ? leagueInfo.name : leagueId,
+              icon: leagueInfo ? leagueInfo.icon : '?',
+              channels: [],
+            };
+          }
+          const serviceChannels = service.leagues[leagueId].channels.map(ch => `${ch} (on ${service.name})`);
+          coveredLeaguesDetails[leagueId].channels = [...new Set([...(coveredLeaguesDetails[leagueId].channels || []), ...serviceChannels])];
+        }
+      });
+    });
+
+    const result = { count: coveredLeaguesSet.size, details: coveredLeaguesDetails };
+    cache.set(cacheKey, result);
+    return result;
+  };
+})();
 
 export const useStreamingStore = defineStore('streaming', {
   state: () => ({
@@ -92,163 +108,180 @@ export const useStreamingStore = defineStore('streaming', {
   }),
 
   getters: {
-    allLeaguesFlat(state) {
-      return state.allLeaguesByCategory.reduce((acc, category) => acc.concat(category.leagues), []);
+    allLeaguesFlat() {
+      return this.allLeaguesByCategory.reduce((acc, category) => acc.concat(category.leagues), []);
     },
 
     allServicesGroupedByCategory(state) {
-        const grouped = {};
-        if (!Array.isArray(state.allAvailableServices)) {
-            return [];
+      const grouped = {};
+      if (!Array.isArray(state.allAvailableServices)) {
+        return [];
+      }
+      state.allAvailableServices.forEach(service => {
+        const category = service.serviceCategory || 'Other';
+        if (!grouped[category]) {
+          grouped[category] = {
+            categoryName: category,
+            icon: category === 'Live TV Streaming' ? '📺' : (category === 'League/Sport Specific' ? '🎯' : (category === 'Sport Specific & Add-ons' ? '➕' : '📦')),
+            services: []
+          };
         }
-        state.allAvailableServices.forEach(service => {
-            const category = service.serviceCategory || 'Other';
-            if (!grouped[category]) {
-                grouped[category] = {
-                    categoryName: category,
-                    icon: category === 'Live TV Streaming' ? '📺' : (category === 'League/Sport Specific' ? '🎯' : (category === 'Sport Specific & Add-ons' ? '➕' : '📦')),
-                    services: []
-                };
-            }
-            grouped[category].services.push(service);
-        });
-        const result = Object.values(grouped).sort((a,b) => a.categoryName.localeCompare(b.categoryName));
-        return result;
+        grouped[category].services.push(service);
+      });
+      const result = Object.values(grouped).sort((a,b) => a.categoryName.localeCompare(b.categoryName));
+      return result;
     },
 
-    processedAvailableServicesFlat(state) {
-        if (!Array.isArray(state.allAvailableServices)) {
-            return [];
-        }
-        return state.allAvailableServices.map(s => ({
-            ...s,
-            numericPrice: parsePrice(s.price),
-            isSubscribed: state.subscribedServiceIds.includes(s.id),
-        }));
+    processedAvailableServicesFlat() {
+      if (!Array.isArray(this.allAvailableServices)) {
+        return [];
+      }
+      return this.allAvailableServices.map(s => ({
+        ...s,
+        numericPrice: parsePrice(s.price),
+        isSubscribed: this.subscribedServiceIds.includes(s.id),
+      }));
     },
 
     selectedLeagues(state) {
       return this.allLeaguesFlat.filter(league => state.selectedLeagueIds.includes(league.id));
     },
 
-    subscribedServicesDetails(state) {
+    subscribedServicesDetails() {
       return this.processedAvailableServicesFlat.filter(service => service.isSubscribed);
     },
 
-    getFilteredServices(state) {
-      if (state.selectedLeagueIds.length === 0) {
+    getFilteredServices() {
+      if (this.selectedLeagueIds.length === 0) {
         return [];
       }
+
       const allLeaguesFlatForHelper = this.allLeaguesFlat;
       const currentProcessedAvailableServices = this.processedAvailableServicesFlat;
-
       const userSubscribedServices = currentProcessedAvailableServices.filter(s => s.isSubscribed);
       const nonSubscribedServices = currentProcessedAvailableServices.filter(s => !s.isSubscribed);
 
-      const baseCoverageFromSubscribed = getBundleCoverageDetails(userSubscribedServices, state.selectedLeagueIds, allLeaguesFlatForHelper);
+      // Pre-calculate base coverage to avoid redundant calculations
+      const baseCoverageFromSubscribed = getBundleCoverageDetails(
+        userSubscribedServices,
+        this.selectedLeagueIds,
+        allLeaguesFlatForHelper
+      );
       const baseCoveredLeagueIds = new Set(Object.keys(baseCoverageFromSubscribed.details));
 
-      // --- 1. Generate Candidate Bundles for "Top Coverage Pick" ---
-      let candidateBundles = [];
-      // Option A: User's current subscriptions
+      // Generate candidate bundles more efficiently
+      const candidateBundles = new Set();
+
+      // Helper to add bundle if not already exists
+      const addBundleIfUnique = (services, idSuffix, additionalCost) => {
+        const canonicalId = services.map(s => s.id).sort().join(',');
+        if (!candidateBundles.has(canonicalId)) {
+          candidateBundles.add(canonicalId);
+          return {
+            idSuffix,
+            servicesInvolved: services,
+            additionalNumericCost: additionalCost,
+          };
+        }
+        return null;
+      };
+
+      // Generate bundles more efficiently
+      const bundles = [];
+
+      // Current subscriptions
       if (userSubscribedServices.length > 0) {
-        candidateBundles.push({
-          idSuffix: 'subscribed_only',
-          servicesInvolved: [...userSubscribedServices],
-          additionalNumericCost: 0,
-        });
-      } else { // If no subscriptions, add an empty base for +1/+2 logic
-         candidateBundles.push({ idSuffix: 'empty_base', servicesInvolved: [], additionalNumericCost: 0 });
+        const bundle = addBundleIfUnique(userSubscribedServices, 'subscribed_only', 0);
+        if (bundle) bundles.push(bundle);
       }
 
-      // Option B: Current subscriptions + 1 new service
-      nonSubscribedServices.forEach(ns1 => {
-        candidateBundles.push({
-          idSuffix: `plus_${ns1.id}`,
-          servicesInvolved: [...userSubscribedServices, ns1],
-          additionalNumericCost: ns1.numericPrice,
-        });
+      // Current subscriptions + 1 new service
+      nonSubscribedServices.forEach(ns => {
+        const bundle = addBundleIfUnique(
+          [...userSubscribedServices, ns],
+          `plus_${ns.id}`,
+          ns.numericPrice
+        );
+        if (bundle) bundles.push(bundle);
       });
 
-      // Option C: Current subscriptions + 2 new services
+      // Current subscriptions + 2 new services
       if (nonSubscribedServices.length >= 2) {
         for (let i = 0; i < nonSubscribedServices.length; i++) {
           for (let j = i + 1; j < nonSubscribedServices.length; j++) {
             const ns1 = nonSubscribedServices[i];
             const ns2 = nonSubscribedServices[j];
-            candidateBundles.push({
-              idSuffix: `plus_${ns1.id}_${ns2.id}`,
-              servicesInvolved: [...userSubscribedServices, ns1, ns2],
-              additionalNumericCost: ns1.numericPrice + ns2.numericPrice,
-            });
+            const bundle = addBundleIfUnique(
+              [...userSubscribedServices, ns1, ns2],
+              `plus_${ns1.id}_${ns2.id}`,
+              ns1.numericPrice + ns2.numericPrice
+            );
+            if (bundle) bundles.push(bundle);
           }
         }
       }
 
-      // Option D: Individual services (from ALL available) as standalone options
+      // Individual services
       currentProcessedAvailableServices.forEach(service => {
-        candidateBundles.push({
-          idSuffix: `single_${service.id}`,
-          servicesInvolved: [service],
-          additionalNumericCost: service.isSubscribed ? 0 : service.numericPrice,
-        });
+        const bundle = addBundleIfUnique(
+          [service],
+          `single_${service.id}`,
+          service.isSubscribed ? 0 : service.numericPrice
+        );
+        if (bundle) bundles.push(bundle);
       });
 
-      // Option E: Pairs of services (from ALL available)
+      // Pairs of services
       if (currentProcessedAvailableServices.length >= 2) {
         for (let i = 0; i < currentProcessedAvailableServices.length; i++) {
           for (let j = i + 1; j < currentProcessedAvailableServices.length; j++) {
             const s1 = currentProcessedAvailableServices[i];
             const s2 = currentProcessedAvailableServices[j];
-            let additionalCost = 0;
-            if (!s1.isSubscribed) additionalCost += s1.numericPrice;
-            if (!s2.isSubscribed) additionalCost += s2.numericPrice;
-            candidateBundles.push({
-              idSuffix: `pair_${s1.id}_${s2.id}`,
-              servicesInvolved: [s1, s2],
-              additionalNumericCost: additionalCost,
-            });
+            const additionalCost = (!s1.isSubscribed ? s1.numericPrice : 0) + (!s2.isSubscribed ? s2.numericPrice : 0);
+            const bundle = addBundleIfUnique(
+              [s1, s2],
+              `pair_${s1.id}_${s2.id}`,
+              additionalCost
+            );
+            if (bundle) bundles.push(bundle);
           }
         }
       }
-      // Consider adding Triplets if performance allows and it's deemed necessary for edge cases.
 
-      // Enrich and Deduplicate candidateBundles
-      const enrichedAndUniqueBundles = [];
-      const seenCanonicalBundleIds = new Set();
+      // Process bundles more efficiently
+      const enrichedAndUniqueBundles = bundles
+        .map(bundleProto => {
+          const canonicalServiceIds = bundleProto.servicesInvolved.map(s => s.id).sort().join(',');
+          const canonicalBundleId = `bundle_services:${canonicalServiceIds}`;
 
-      candidateBundles.forEach(bundleProto => {
-        // Ensure servicesInvolved are unique in case of overlap (e.g. single service bundle where service is also in userSubscribedServices)
-        const uniqueServicesInBundle = [];
-        const seenServiceIdsInCurrentBundle = new Set();
-        bundleProto.servicesInvolved.forEach(s => {
-            if(!seenServiceIdsInCurrentBundle.has(s.id)){
-                uniqueServicesInBundle.push(s);
-                seenServiceIdsInCurrentBundle.add(s.id);
-            }
-        });
-        bundleProto.servicesInvolved = uniqueServicesInBundle;
+          const coverage = getBundleCoverageDetails(
+            bundleProto.servicesInvolved,
+            this.selectedLeagueIds,
+            allLeaguesFlatForHelper
+          );
 
-        // Skip empty bundles that can arise if user has no subscriptions and we try to make "subscribed_only"
-        if (bundleProto.idSuffix === 'subscribed_only' && bundleProto.servicesInvolved.length === 0 && userSubscribedServices.length > 0) {
-            // This case should not happen if userSubscribedServices.length > 0, but as a safeguard.
-        } else if (bundleProto.servicesInvolved.length === 0 && bundleProto.idSuffix !== 'empty_base' ) {
-            return;
-        }
+          if (coverage.count === 0) return null;
 
+          const item = {
+            ...bundleProto,
+            id: canonicalBundleId,
+            type: 'bundle',
+            totalCoveredLeaguesCount: coverage.count,
+            selectedLeaguesCoveredDetails: coverage.details,
+            totalNumericPrice: bundleProto.servicesInvolved.reduce((sum, s) => sum + (s.numericPrice || 0), 0),
+            newlyCoveredLeaguesDetails: {},
+            displayName: bundleProto.servicesInvolved.length === 1
+              ? bundleProto.servicesInvolved[0].name
+              : bundleProto.servicesInvolved.map(s => s.name).join(' + '),
+            valueScore: bundleProto.additionalNumericCost > 0
+              ? coverage.count / bundleProto.additionalNumericCost
+              : (coverage.count > 0 ? Infinity : 0),
+            badge: null,
+            redundantSubscriptions: [],
+            potentialSavings: 0
+          };
 
-        const canonicalServiceIds = bundleProto.servicesInvolved.map(s => s.id).sort().join(',');
-        const canonicalBundleId = `bundle_services:${canonicalServiceIds}`; // More robust ID
-
-        if (!seenCanonicalBundleIds.has(canonicalBundleId)) {
-          const item = { ...bundleProto, id: canonicalBundleId, type: 'bundle' }; // All are 'bundle' type now
-
-          const coverage = getBundleCoverageDetails(item.servicesInvolved, state.selectedLeagueIds, allLeaguesFlatForHelper);
-          item.totalCoveredLeaguesCount = coverage.count;
-          item.selectedLeaguesCoveredDetails = coverage.details;
-          item.totalNumericPrice = item.servicesInvolved.reduce((sum, s) => sum + (s.numericPrice || 0), 0);
-
-          item.newlyCoveredLeaguesDetails = {};
+          // Calculate newly covered leagues
           Object.keys(coverage.details).forEach(leagueId => {
             const isNewServiceBundle = item.servicesInvolved.every(s => !userSubscribedServices.find(us => us.id === s.id));
             if (!baseCoveredLeagueIds.has(leagueId) || isNewServiceBundle) {
@@ -256,30 +289,13 @@ export const useStreamingStore = defineStore('streaming', {
             }
           });
 
-          if (item.servicesInvolved.length === 1) {
-              item.displayName = item.servicesInvolved[0].name;
-          } else if (item.servicesInvolved.length > 1) {
-              item.displayName = item.servicesInvolved.map(s => s.name).join(' + ');
-          } else {
-              item.displayName = "No Services Needed";
-          }
-          item.valueScore = item.additionalNumericCost > 0
-                              ? item.totalCoveredLeaguesCount / item.additionalNumericCost
-                              : (item.totalCoveredLeaguesCount > 0 ? Infinity : 0);
-          item.badge = null;
-          item.redundantSubscriptions = [];
-          item.potentialSavings = 0;
-
-          if (item.totalCoveredLeaguesCount > 0) { // Only consider bundles that cover at least one selected league
-             enrichedAndUniqueBundles.push(item);
-          }
-          seenCanonicalBundleIds.add(canonicalBundleId);
-        }
-      });
+          return item;
+        })
+        .filter(Boolean);
 
       if (enrichedAndUniqueBundles.length === 0) return [];
 
-      // Sort for "Top Coverage Pick"
+      // Sort bundles more efficiently
       enrichedAndUniqueBundles.sort((a, b) => {
         if (b.totalCoveredLeaguesCount !== a.totalCoveredLeaguesCount) return b.totalCoveredLeaguesCount - a.totalCoveredLeaguesCount;
         if (a.totalNumericPrice !== b.totalNumericPrice) return a.totalNumericPrice - b.totalNumericPrice;
@@ -287,107 +303,118 @@ export const useStreamingStore = defineStore('streaming', {
         return a.servicesInvolved.length - b.servicesInvolved.length;
       });
 
-      let topCoverageItem = { ...enrichedAndUniqueBundles[0], badge: 'Top Coverage' };
-      if (topCoverageItem.servicesInvolved.length > 0) { // Ensure it's not an empty bundle
+      // Process top coverage pick
+      let topCoverageItem = enrichedAndUniqueBundles[0] ? {
+        ...enrichedAndUniqueBundles[0],
+        badge: 'Top Coverage'
+      } : null;
+
+      if (topCoverageItem?.servicesInvolved.length > 0) {
         const servicesInTopCoverageSet = new Set(topCoverageItem.servicesInvolved.map(s => s.id));
-        userSubscribedServices.forEach(subscribedService => {
-          if (!servicesInTopCoverageSet.has(subscribedService.id)) {
-            topCoverageItem.redundantSubscriptions.push({
-              id: subscribedService.id, name: subscribedService.name,
-              price: subscribedService.price, numericPrice: subscribedService.numericPrice
-            });
-            topCoverageItem.potentialSavings += subscribedService.numericPrice;
-          }
-        });
-      } else {
-        topCoverageItem = null; // No valid top coverage pick
+        topCoverageItem.redundantSubscriptions = userSubscribedServices
+          .filter(subscribedService => !servicesInTopCoverageSet.has(subscribedService.id))
+          .map(subscribedService => ({
+            id: subscribedService.id,
+            name: subscribedService.name,
+            price: subscribedService.price,
+            numericPrice: subscribedService.numericPrice
+          }));
+        topCoverageItem.potentialSavings = topCoverageItem.redundantSubscriptions.reduce((sum, s) => sum + s.numericPrice, 0);
       }
 
-      // --- 2. Determine "Best Value Pick (Cheaper Alt.)" ---
+      // Process best value pick
       let bestValueCheaperItem = null;
       if (topCoverageItem) {
-        const poolForCheaperValue = enrichedAndUniqueBundles.filter(item =>
-          item.id !== topCoverageItem.id &&
-          item.totalNumericPrice < topCoverageItem.totalNumericPrice &&
-          item.totalCoveredLeaguesCount > 0
-        );
-
-        if (poolForCheaperValue.length > 0) {
-          poolForCheaperValue.sort((a, b) => {
+        const poolForCheaperValue = enrichedAndUniqueBundles
+          .filter(item =>
+            item.id !== topCoverageItem.id &&
+            item.totalNumericPrice < topCoverageItem.totalNumericPrice &&
+            item.totalCoveredLeaguesCount > 0
+          )
+          .sort((a, b) => {
             if (b.valueScore !== a.valueScore) return b.valueScore - a.valueScore;
             if (b.totalCoveredLeaguesCount !== a.totalCoveredLeaguesCount) return b.totalCoveredLeaguesCount - a.totalCoveredLeaguesCount;
             return a.additionalNumericCost - b.additionalNumericCost;
           });
-          bestValueCheaperItem = { ...poolForCheaperValue[0], badge: 'Best Value' };
-            if (bestValueCheaperItem.type === 'bundle') { // All items are 'bundle' type now
-                const servicesInValueBundleSet = new Set(bestValueCheaperItem.servicesInvolved.map(s => s.id));
-                bestValueCheaperItem.redundantSubscriptions = [];
-                bestValueCheaperItem.potentialSavings = 0;
-                userSubscribedServices.forEach(subscribedService => {
-                    if (!servicesInValueBundleSet.has(subscribedService.id)) {
-                        bestValueCheaperItem.redundantSubscriptions.push({
-                            id: subscribedService.id, name: subscribedService.name,
-                            price: subscribedService.price, numericPrice: subscribedService.numericPrice
-                        });
-                        bestValueCheaperItem.potentialSavings += subscribedService.numericPrice;
-                    }
-                });
-            }
+
+        if (poolForCheaperValue.length > 0) {
+          bestValueCheaperItem = {
+            ...poolForCheaperValue[0],
+            badge: 'Best Value',
+            redundantSubscriptions: [],
+            potentialSavings: 0
+          };
+
+          const servicesInValueBundleSet = new Set(bestValueCheaperItem.servicesInvolved.map(s => s.id));
+          bestValueCheaperItem.redundantSubscriptions = userSubscribedServices
+            .filter(subscribedService => !servicesInValueBundleSet.has(subscribedService.id))
+            .map(subscribedService => ({
+              id: subscribedService.id,
+              name: subscribedService.name,
+              price: subscribedService.price,
+              numericPrice: subscribedService.numericPrice
+            }));
+          bestValueCheaperItem.potentialSavings = bestValueCheaperItem.redundantSubscriptions.reduce((sum, s) => sum + s.numericPrice, 0);
         }
       }
 
-      // --- Assemble Final List ---
+      // Assemble final list
       const finalList = [];
-      if (topCoverageItem) finalList.push(topCoverageItem);
-
       const addedToFinalListPrimaryIds = new Set();
-      if(topCoverageItem) addedToFinalListPrimaryIds.add(topCoverageItem.id);
+
+      if (topCoverageItem) {
+        finalList.push(topCoverageItem);
+        addedToFinalListPrimaryIds.add(topCoverageItem.id);
+      }
 
       if (bestValueCheaperItem && (!topCoverageItem || bestValueCheaperItem.id !== topCoverageItem.id)) {
         finalList.push(bestValueCheaperItem);
         addedToFinalListPrimaryIds.add(bestValueCheaperItem.id);
       }
 
-      // Add remaining *individual services* that are not part of ANY services within the badged items
+      // Add remaining individual services
       const servicesInFinalBadgedItems = new Set(finalList.flatMap(item => item.servicesInvolved.map(s => s.id)));
 
-      currentProcessedAvailableServices
+      const remainingServices = currentProcessedAvailableServices
         .filter(service => !servicesInFinalBadgedItems.has(service.id))
         .map(service => {
-            const coverage = getBundleCoverageDetails([service], state.selectedLeagueIds, allLeaguesFlatForHelper);
-            if (coverage.count > 0) {
-                const effectiveNumericPrice = service.isSubscribed ? 0 : service.numericPrice;
-                return {
-                    id: service.id, type: 'service', servicesInvolved: [service], displayName: service.name,
-                    totalCoveredLeaguesCount: coverage.count, selectedLeaguesCoveredDetails: coverage.details,
-                    additionalNumericCost: effectiveNumericPrice,
-                    numericPrice: service.numericPrice, totalNumericPrice: service.numericPrice,
-                    isSubscribed: service.isSubscribed,
-                    valueScore: effectiveNumericPrice > 0 ? coverage.count / effectiveNumericPrice : (coverage.count > 0 ? Infinity : 0),
-                    badge: null, notes: service.notes, link: service.link, originalService: service,
-                    newlyCoveredLeaguesDetails: {},
-                };
-            }
-            return null;
+          const coverage = getBundleCoverageDetails([service], this.selectedLeagueIds, allLeaguesFlatForHelper);
+          if (coverage.count === 0) return null;
+
+          const effectiveNumericPrice = service.isSubscribed ? 0 : service.numericPrice;
+          return {
+            id: service.id,
+            type: 'service',
+            servicesInvolved: [service],
+            displayName: service.name,
+            totalCoveredLeaguesCount: coverage.count,
+            selectedLeaguesCoveredDetails: coverage.details,
+            additionalNumericCost: effectiveNumericPrice,
+            numericPrice: service.numericPrice,
+            totalNumericPrice: service.numericPrice,
+            isSubscribed: service.isSubscribed,
+            valueScore: effectiveNumericPrice > 0 ? coverage.count / effectiveNumericPrice : (coverage.count > 0 ? Infinity : 0),
+            badge: null,
+            notes: service.notes,
+            link: service.link,
+            originalService: service,
+            newlyCoveredLeaguesDetails: {}
+          };
         })
-        .filter(item => item !== null)
-        .sort((a,b) => {
-            if (a.isSubscribed && !b.isSubscribed) return -1;
-            if (!a.isSubscribed && b.isSubscribed) return 1;
-            if (b.totalCoveredLeaguesCount !== a.totalCoveredLeaguesCount) return b.totalCoveredLeaguesCount - a.totalCoveredLeaguesCount;
-            return a.additionalNumericCost - b.additionalNumericCost;
-        })
-        .forEach(item => {
-            // Ensure this individual service (now an item with type 'service') isn't already represented by a badged item's ID
-            if (!finalList.some(fi => fi.id === item.id)) {
-                 finalList.push(item);
-            }
+        .filter(Boolean)
+        .sort((a, b) => {
+          if (a.isSubscribed && !b.isSubscribed) return -1;
+          if (!a.isSubscribed && b.isSubscribed) return 1;
+          if (b.totalCoveredLeaguesCount !== a.totalCoveredLeaguesCount) return b.totalCoveredLeaguesCount - a.totalCoveredLeaguesCount;
+          return a.additionalNumericCost - b.additionalNumericCost;
         });
 
-      // Debugging logs (optional, remove for production)
-      // console.log("Top Coverage Pick:", JSON.parse(JSON.stringify(topCoverageItem)));
-      // console.log("Best Value Cheaper Pick:", JSON.parse(JSON.stringify(bestValueCheaperItem)));
-      // console.log("Final List for UI:", JSON.parse(JSON.stringify(finalList.map(i => ({id: i.id, name: i.displayName, badge: i.badge, services: i.servicesInvolved.map(s=>s.name)})))));
+      remainingServices.forEach(item => {
+        if (!finalList.some(fi => fi.id === item.id)) {
+          finalList.push(item);
+        }
+      });
+
       return finalList;
     }
   },
@@ -446,7 +473,7 @@ function hydrateStoreFromLocalStorage(store) {
     if (Array.isArray(leagues)) store.selectedLeagueIds = leagues;
     const services = JSON.parse(localStorage.getItem(LS_SERVICES));
     if (Array.isArray(services)) store.subscribedServiceIds = services;
-  } catch (e) { /* ignore */ }
+  } catch { /* ignore */ }
 }
 
 function setupLocalStoragePersistence(store) {
