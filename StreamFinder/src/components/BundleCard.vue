@@ -1,5 +1,5 @@
 <template>
-  <div
+  <article
     class="rounded-2xl shadow-xl p-6 md:p-8 mb-8 border border-slate-200 dark:border-slate-700/50 bg-white/80 dark:bg-slate-700/80 backdrop-blur-md transition-all duration-300 relative h-full flex flex-col animated-glow ring-1 ring-emerald-400/30 [box-shadow:0_0_16px_2px_rgba(16,185,129,0.25)]"
     :class="[
       isPrimaryRecommendation && item.badge === 'Top Coverage' ? 'ring-2 ring-emerald-400/60' + (isMainPick ? ' md:shadow-2xl' : '') :
@@ -64,7 +64,7 @@
       </div>
       <div v-if="item.badge === 'Top Coverage' && isPrimaryRecommendation && item.redundantSubscriptions && item.redundantSubscriptions.length > 0"
            class="my-3 p-3 bg-orange-50/60 dark:bg-orange-100/20 border border-orange-200 dark:border-orange-300/40 rounded-lg shadow-sm">
-        <button @click="savingsVisible = !savingsVisible" class="w-full text-left focus:outline-none group block min-h-[44px]">
+        <button @click="savingsVisible = !savingsVisible" class="w-full text-left focus:outline-none group block min-h-[44px]" :aria-expanded="savingsVisible" aria-label="Toggle potential savings details">
           <div class="flex justify-between items-center">
             <h4 class="text-sm font-semibold text-orange-600 dark:text-orange-400 group-hover:text-orange-700 dark:group-hover:text-orange-500">Potential Savings!</h4>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 sm:w-6 sm:h-6 text-orange-400 group-hover:text-orange-500 transition-transform duration-200" :class="{'rotate-180': savingsVisible}">
@@ -132,13 +132,14 @@
               target="_blank"
               rel="noopener noreferrer"
               class="text-sm font-medium mt-1.5 sm:mt-0 bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 px-5 py-2 rounded-xl transition-all duration-300 whitespace-nowrap shadow-md hover:shadow-lg hover:scale-[1.02] flex items-center justify-center min-h-0 min-w-0"
+              :aria-label="'Visit ' + service.name + ' website'"
             >
               Visit {{ service.name }} &rarr;
             </a>
           </li>
         </ul>
       </div>
-    </div>
+  </article>
 </template>
 
 <script setup>

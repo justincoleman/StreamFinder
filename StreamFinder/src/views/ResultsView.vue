@@ -68,6 +68,8 @@
             <button
               @click="showOtherOptions = !showOtherOptions"
               class="w-full max-w-xl flex justify-between items-center py-3.5 px-5 rounded-xl text-lg font-semibold text-slate-800 dark:text-slate-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-500 shadow-none border-none bg-transparent hover:bg-slate-100/60 dark:hover:bg-slate-800/40"
+              :aria-expanded="showOtherOptions"
+              aria-label="Toggle other options visibility"
             >
               <span>{{ showOtherOptions ? 'Hide' : 'Show' }} Other Options ({{ otherOptions.length }})</span>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6 transition-transform duration-300" :class="{'rotate-180': showOtherOptions}">
@@ -85,7 +87,7 @@
               <div v-show="showOtherOptions" class="w-full max-w-5xl">
                 <div class="flex flex-wrap items-center gap-3 mb-6 mt-6 justify-center">
                   <label class="font-medium text-sm text-slate-800 dark:text-slate-300">Sort by:</label>
-                  <select v-model="sortBy" class="border border-slate-200 dark:border-slate-700/50 rounded-lg px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-500 min-w-[120px]">
+                  <select v-model="sortBy" class="border border-slate-200 dark:border-slate-700/50 rounded-lg px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-500 min-w-[120px]" aria-label="Sort options">
                     <option value="price">Price</option>
                     <option value="leagues">Leagues Covered</option>
                   </select>

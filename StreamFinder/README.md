@@ -6,12 +6,14 @@
 
 - ⚡ **Vue 3 + Vite** for fast, modern development
 - 🎨 **Tailwind CSS v4** for utility-first, glassmorphic design
-- 🌗 **Auto dark/light theme** (system preference, with manual override logic)
+- 🌗 **Auto dark/light theme** (system preference; manual toggle removed for consistency)
 - 🏆 **Smart recommendations**: Highlights top bundles/services for your chosen leagues
 - 🗂️ **Compare options**: See all possible bundles and services, sortable by price or coverage
 - 🧩 **Reusable components**: StreamingServiceCard, BundleCard, LeagueSelector, and more
 - 🗃️ **Pinia** for state management
 - 🔗 **Vue Router** for navigation
+- ♿ **Accessibility improvements**: Semantic HTML, ARIA attributes, keyboard navigation, and visible focus states
+- 📱 **Mobile responsive**: Optimized layouts and touch targets for all devices
 - 📦 **Ready for Netlify deployment**
 
 ## Project Structure
@@ -78,13 +80,21 @@ npm run format
 ## Theming
 
 - Theme is managed via `useTheme.js` composable.
-- Follows system preference by default, with logic for manual override.
+- Follows system preference by default. Manual toggle was removed for consistency and to avoid override issues with Tailwind v4 and Vite plugin.
 - Applies `dark` or `light` class to `<html>` for Tailwind dark mode.
+
+## Accessibility & Mobile Responsiveness
+
+- All main views and components use semantic HTML elements (e.g., `<section>`, `<article>`, `<button>`, `<nav>`).
+- ARIA attributes are used for improved screen reader support (e.g., `aria-label`, `aria-expanded`).
+- All interactive elements are keyboard accessible and have visible focus states.
+- Color contrast and font sizes are checked for readability.
+- Layouts are fully responsive, with touch-friendly targets and spacing for mobile devices.
 
 ## Credits
 
 - Built with [Vue 3](https://vuejs.org/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/), [Pinia](https://pinia.vuejs.org/), and [Vue Router](https://router.vuejs.org/).
-- UI/UX design: glassmorphic, modern, and responsive.
+- UI/UX design: glassmorphic, modern, responsive, and accessible.
 
 ---
 
