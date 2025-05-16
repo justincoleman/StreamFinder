@@ -7,7 +7,7 @@
       <div class="flex justify-end space-x-3">
         <button
           @click="store.selectAllLeagues()"
-          class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-150 min-h-[44px] min-w-[44px]"
+          class="px-4 py-2 text-sm font-medium text-white bg-emerald-700 hover:bg-emerald-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-150 min-h-[44px] min-w-[44px]"
         >
           Select All Leagues
         </button>

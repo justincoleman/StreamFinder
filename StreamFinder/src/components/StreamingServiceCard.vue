@@ -18,7 +18,7 @@
 
     <div
       v-if="service.isSubscribed && !isSecondaryOption && (!service.badge || !isPrimaryRecommendation)"
-      class="absolute top-2 right-2 bg-green-600 text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow z-10"
+      class="absolute top-2 right-2 bg-green-800 text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow z-10"
     >
       ✓ Subscribed
     </div>
