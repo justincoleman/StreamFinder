@@ -19,7 +19,7 @@
         <p class="text-base sm:text-lg text-slate-700 dark:text-slate-300 mt-2 max-w-lg mx-auto leading-relaxed">
           Never miss a game again. Find the perfect streaming package for your favorite sports in seconds.
         </p>
-        <div class="mt-8 flex justify-center space-x-6">
+        <div class="mt-8 flex flex-col sm:flex-row justify-center items-center sm:space-x-6 space-y-4 sm:space-y-0">
           <div class="flex items-center text-sm text-slate-700 dark:text-slate-300">
             <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mr-3 shadow-lg">
               <span class="text-white font-bold">1</span>

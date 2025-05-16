@@ -24,7 +24,7 @@
         </div>
       </header>
 
-      <main class="rounded-2xl bg-white/80 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-700/50 pt-10">
+      <main class="rounded-2xl bg-white/80 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-700/50 pt-10 px-2 sm:px-6">
         <div v-if="store.selectedLeagueIds.length === 0" class="text-center py-10 bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-sm p-6 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700/50">
           <p class="text-xl text-slate-300">No leagues selected.</p>
           <router-link to="/" class="mt-4 inline-block bg-gradient-to-r from-blue-400 to-indigo-500 text-white hover:from-blue-500 hover:to-indigo-600 font-medium py-2 px-4 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]">
@@ -94,7 +94,7 @@
                     <span v-else class="inline-block">▼</span>
                   </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-2 sm:px-0">
                   <div v-for="item in sortedOtherOptions" :key="item.id" class="flex flex-col">
                     <StreamingServiceCard
                       v-if="item.type === 'bundle' && item.servicesInvolved.length === 1"

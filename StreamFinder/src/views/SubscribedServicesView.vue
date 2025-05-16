@@ -11,23 +11,23 @@
       </header>
 
       <main class="bg-white/80 dark:bg-slate-700/80 backdrop-blur-md p-6 md:p-8 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700/50">
-        <div class="flex justify-between items-center mb-8">
-          <router-link to="/" class="inline-flex items-center px-4 py-2 text-base font-medium text-white bg-slate-600/80 hover:bg-slate-500 border border-white/20 rounded-lg shadow transition-all duration-200">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-3 sm:gap-0">
+          <router-link to="/" class="w-full sm:w-auto inline-flex items-center px-4 py-2 text-base font-medium text-white bg-slate-600/80 hover:bg-slate-500 border border-white/20 rounded-lg shadow transition-all duration-200 justify-center mb-2 sm:mb-0">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-2">
               <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
             </svg>
             Back to League Selection
           </router-link>
-          <div class="flex space-x-3">
+          <div class="flex flex-col sm:flex-row w-full sm:w-auto gap-3 sm:gap-0 sm:space-x-3">
             <button
               @click="store.selectAllServices()"
-              class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-emerald-500"
+              class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-emerald-500"
             >
               Select All My Services
             </button>
             <button
               @click="store.unselectAllServices()"
-              class="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700/50 hover:bg-slate-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500 border border-slate-600/50"
+              class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700/50 hover:bg-slate-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500 border border-slate-600/50"
             >
               Unselect All
             </button>
