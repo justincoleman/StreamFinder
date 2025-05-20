@@ -22,7 +22,7 @@
 
     <div class="space-y-4 bg-white/80 dark:bg-slate-700/80 rounded-2xl border border-slate-200 dark:border-slate-700/50 backdrop-blur-md p-4 sm:p-6 md:p-8">
       <ul>
-        <li v-for="category in store.allLeaguesByCategory" :key="category.categoryName" class="border border-slate-200 dark:border-slate-700/50 rounded-xl shadow-lg overflow-hidden bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm">
+        <li v-for="category in store.allLeaguesByCategory" :key="category.categoryName" class="border border-slate-200 dark:border-slate-700/50 rounded-xl shadow-lg overflow-hidden bg-slate-100/80 dark:bg-slate-800/80 backdrop-blur-sm mb-9">
           <button
             @click="store.toggleCategoryExpansion(category.categoryName)"
             class="w-full flex justify-between items-center p-3 sm:p-4 bg-gradient-to-r from-slate-50 to-slate-200 dark:from-slate-800/50 dark:to-slate-700/50 hover:from-slate-100 hover:to-slate-300 dark:hover:from-slate-700/50 dark:hover:to-slate-600/50 transition-all duration-300 focus:outline-none min-h-[44px] min-w-[44px]"

@@ -1,9 +1,4 @@
 {
-  "ytv": "https://tv.youtube.com/welcome",
-  "hulu_live": "https://secure.hulu.com/account/signin",
-  "fubo": "https://www.fubo.tv/sign-in",
-  "sling": "https://www.sling.com/sign-in",
-  "directv_stream": "https://stream.directv.com/login",
   "espnp": "https://plus.espn.com/login",
   "paramount_plus": "https://www.paramountplus.com/account/signin/",
   "peacock": "https://www.peacocktv.com/signin",
