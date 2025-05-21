@@ -1,151 +1,181 @@
 <template>
-  <article
-    class="shadow-none p-4 md:p-6 mb-6 border-4 border-indigo-500 bg-white flex flex-col gap-3 relative text-base dark:bg-[#181824] dark:border-indigo-500"
-    :class="{}"
-  >
-    <!-- Badge -->
-    <div v-if="item.badge" class="absolute -top-6 right-4">
+  <div class="relative w-full flex flex-col items-center">
+    <!-- Badge sits fully outside the card -->
+    <div v-if="item.badge" class="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-30 border-0">
       <span v-if="item.badge === 'Best Value'"
-        class="bundle-badge bundle-badge-best inline-block px-6 py-2 border-4 border-indigo-white bg-accent-yellow bg-indigo-500 text-white font-extrabold font-mono text-lg uppercase tracking-widest dark:bg-indigo-500 dark:text-white dark:border-white">
+        class="bundle-badge bundle-badge-best inline-block px-6 py-2 border-4 border-indigo-white bg-accent-yellow bg-indigo-500 text-indigo-500 font-extrabold font-mono text-lg uppercase tracking-widest dark:bg-indigo-500 dark:text-white dark:border-white">
         {{ item.badge }}
       </span>
       <span v-else
-        class="bundle-badge bundle-badge-main inline-block px-6 py-2 border-4 border-primary bg-primary text-white font-extrabold font-mono text-lg uppercase tracking-widest">
+        class="bundle-badge bundle-badge-main inline-block px-4 sm:px-6 py-2 border-4 border-white bg-indigo-500 text-white font-extrabold font-mono text-lg uppercase tracking-widest">
         {{ item.badge }}
       </span>
     </div>
-
-    <!-- Bundle Heading -->
-    <div class="flex flex-row items-start justify-between mb-2">
-      <div class="flex flex-col gap-1">
-        <div class="flex flex-row items-center gap-6">
-          <h3 class="text-4xl md:text-5xl font-extrabold font-mono text-black uppercase tracking-widest dark:text-white">
-            <template v-if="item.servicesInvolved.length > 1">Recommended Bundle</template>
-            <template v-else>{{ item.servicesInvolved[0]?.name || item.displayName }}</template>
-          </h3>
-          <span class="text-4xl md:text-5xl font-extrabold text-primary ml-2 dark:text-accent-yellow">${{ item.totalNumericPrice?.toFixed(2) }}</span>
-          <span class="text-xs font-mono text-black ml-1 dark:text-white">/mo</span>
-        </div>
-        <div v-if="leaguesToShow.length > 0" class="flex items-center gap-2 flex-wrap mt-1">
-          <span v-for="league in leaguesToShow" :key="league.id" class="flex items-center gap-1 px-2 py-1 bg-slate-100 dark:bg-black dark:text-white text-base font-medium border-2 border-black">
-            <span class="text-xl">{{ league.icon }}</span>
-            <span class="text-sm">{{ league.name }}</span>
-          </span>
-        </div>
-        <div v-if="whyThisBundle" class="flex items-center gap-2 mb-1 mt-1 ">
-          <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M13 16h-1v-4h-1m1-4h.01" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-          </svg>
-          <span class="text-base text-black dark:text-blue-300 font-mono font-bold">{{ whyThisBundle }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Coverage by League Heading -->
-    <div v-if="leaguesWithCoverage.length > 0" class="mt-2 mb-1">
-      <h4 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-2">Coverage by League</h4>
-    </div>
-
-    <!-- Per-League Coverage (for all selected leagues) -->
-    <div v-if="leaguesWithCoverage.length > 0" class="mt-2 mb-1 space-y-3">
-      <div v-for="league in leaguesWithCoverage" :key="league.id">
-        <div class="flex items-center gap-2 mb-1">
-          <span class="text-lg font-extrabold font-mono text-black uppercase dark:text-white">{{ league.name }} Coverage:</span>
-          <span class="text-base font-extrabold text-primary">
-            {{ league.id === 'nfl' && getNflCoverageCapped < (item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0)
-              ? getNflCoverageCapped
-              : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0 }}%
-          </span>
-        </div>
-        <div class="w-full h-6 border-4 border-primary bg-white mb-1 overflow-hidden dark:bg-[#10101a] dark:border-indigo-400">
-          <div
-            class="h-full bg-black transition-all duration-700 dark:bg-indigo-500"
-            :style="{ width: (animatedCoverage[league.id] > 0 ? animatedCoverage[league.id] : 0) + '%' }"
-          ></div>
-        </div>
-        <div v-if="getAggregatedCoverageNotes(league.id).length" class="mb-1">
-          <button @click="toggleLeagueInfo(league.id)" class="text-xs text-blue-600 dark:text-blue-300 underline hover:no-underline focus:outline-none">
-            {{ expandedLeagues[league.id] ? 'Hide Info' : 'More Info' }}
-          </button>
-          <transition name="fade-slide">
-            <div v-show="expandedLeagues[league.id]" class="mt-1 text-sm text-slate-600 dark:text-slate-300">
-              <ul class="list-disc ml-5">
-                <li v-for="note in getAggregatedCoverageNotes(league.id)" :key="note">{{ note }}</li>
-              </ul>
+    <article
+      class="shadow-none p-2 sm:p-4 md:p-6 mb-6 border-4 border-indigo-500 bg-white flex flex-col gap-3 relative text-base dark:bg-[#181824] dark:border-indigo-500 w-full max-w-full box-border overflow-x-hidden"
+      :class="{}"
+      style="margin-top: 2.5rem;"
+    >
+      <!-- Bundle Heading -->
+      <div class="flex flex-row items-start justify-between mb-2 w-full min-w-0">
+        <div class="flex flex-col gap-1 min-w-0 w-full">
+          <div class="flex flex-row items-center gap-4 flex-wrap min-w-0 w-full">
+            <h3 class="text-2xl md:text-3xl font-extrabold font-mono text-black uppercase tracking-widest dark:text-white  min-w-0 w-3/3 mt-3">
+              <template v-if="item.servicesInvolved.length > 1">Recommended Bundle</template>
+              <template v-else>{{ item.servicesInvolved[0]?.name || item.displayName }}</template>
+            </h3>
+            <div class="flex items-baseline gap-1 flex-shrink-0">
+              <span class="text-2xl md:text-3xl font-extrabold text-primary dark:text-accent-yellow whitespace-nowrap">${{ item.totalNumericPrice?.toFixed(2) }}</span>
+              <span class="text-xs font-mono text-black dark:text-white">/mo</span>
             </div>
-          </transition>
-        </div>
-        <div v-if="league.id === 'nfl' && getNflCoverageCapped >= 80" class="mt-2 text-sm text-amber-600 dark:text-amber-400">
-          <span class="inline-flex items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </div>
+          <div v-if="whyThisBundle" class="flex items-center gap-2 mb-1 mt-1 w-full min-w-0 break-words">
+            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M13 16h-1v-4h-1m1-4h.01" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
             </svg>
-            Warning: This bundle does NOT provide 100% live NFL coverage. You will miss FOX Sunday games and out-of-market games.
-          </span>
-        </div>
-        <div v-if="(item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) < 100" class="mt-1 text-xs text-orange-600 dark:text-orange-400">
-          <span v-if="showBudgetMessage">Your budget does not allow for full {{ league.name }} coverage. </span>
-          <span v-if="league.id === 'nfl'">Due to US broadcast rights and blackout rules, 100% live NFL coverage is not possible, even with all available services.</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Services Included as Links -->
-    <div class="flex items-center gap-2 flex-wrap mt-1">
-      <span class="text-base font-bold font-mono text-black dark:text-white">Services:</span>
-      <template v-for="service in item.servicesInvolved" :key="service.id">
-        <span class="font-extrabold font-mono text-lg uppercase border-b-4 border-black dark:border-white pb-1 mr-4 service-btn">{{ service.name }}</span>
-      </template>
-    </div>
-
-    <!-- Details Section (only if there are details) -->
-    <div v-if="hasDetails" class="mt-2">
-      <button @click="detailsOpen = !detailsOpen"
-              class="inline-flex items-center gap-2 px-4 py-2 border-4 border-black bg-white text-black font-extrabold font-mono text-base shadow-none hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 mt-4 uppercase tracking-widest dark:bg-black dark:text-white dark:border-primary"
-              :aria-expanded="detailsOpen"
-              aria-controls="bundle-details">
-        <svg v-if="!detailsOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-        </svg>
-        <span>{{ detailsOpen ? 'Hide Details' : 'Show Details' }}</span>
-      </button>
-      <transition name="fade-slide">
-        <div v-show="detailsOpen" id="bundle-details" class="mt-2">
-          <!-- Brutalist Coverage Table: Services as rows, Leagues as columns, checkmark if covered -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full border-4 border-black dark:border-white bg-white dark:bg-black text-base font-mono brutalist-table">
-              <thead>
-                <tr>
-                  <th class="p-4 font-extrabold text-left border-4 border-black dark:border-indigo-500 uppercase">Service</th>
-                  <th v-for="league in leaguesToShow" :key="league.id" class="p-4 font-extrabold text-center border-4 border-black dark:border-indigo-500 uppercase">
-                    <span class="flex flex-col items-center">
-                      <span class="text-2xl">{{ league.icon }}</span>
-                      <span class="text-xs mt-1">{{ league.name }}</span>
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="service in item.servicesInvolved" :key="service.id">
-                  <td class="p-4 font-extrabold border-4 border-black dark:border-indigo-500 uppercase">{{ service.name }}</td>
-                  <td v-for="league in leaguesToShow" :key="service.id + '-' + league.id" class="p-4 text-center font-extrabold border-4 border-black dark:border-indigo-500">
-                    <span v-if="service.leagues && service.leagues[league.id] && service.leagues[league.id].coveragePercent > 0" class="inline-flex items-center justify-center text-3xl">
-                      ✓
-                    </span>
-                    <span v-else class="inline-block w-8 h-8 text-2xl">—</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <span class="text-base text-black dark:text-blue-300 font-mono font-bold break-words w-full min-w-0">{{ whyThisBundle }}</span>
           </div>
         </div>
-      </transition>
-    </div>
-  </article>
+      </div>
+
+      <!-- Coverage by League Heading -->
+      <div v-if="leaguesWithCoverage.length > 0" class="mt-2 mb-1">
+        <h4 class="text-lg font-semibold text-slate-700 dark:text-slate-200 mb-2">Coverage by League</h4>
+      </div>
+
+      <!-- Per-League Coverage (for all selected leagues) -->
+      <div v-if="leaguesWithCoverage.length > 0" class="mt-2 mb-1 grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-2 w-full max-w-full min-w-0">
+        <div v-for="league in leaguesWithCoverage" :key="league.id" class="flex flex-col items-center flex-1 min-w-0 box-border">
+          <div class="relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 mb-2">
+            <svg viewBox="0 0 48 48" class="absolute top-0 left-0 w-20 h-20 sm:w-24 sm:h-24">
+              <circle cx="24" cy="24" r="20" fill="none" stroke="#e5e7eb" stroke-width="6" />
+              <circle
+                cx="24" cy="24" r="20" fill="none"
+                :stroke="(league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) === 100 ? '#a259ff' : '#111'"
+                stroke-width="6"
+                :stroke-dasharray="(league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) * 1.257 + ', 125.7'"
+                stroke-linecap="round"
+                :style="{ transition: 'stroke-dasharray 0.7s cubic-bezier(0.4,0,0.2,1)' }"
+                transform="rotate(-90 24 24)"
+              />
+            </svg>
+            <span class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+              <span class="text-lg font-extrabold px-2 dark:text-white">{{ league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0 }}%</span>
+            </span>
+            <!-- NFL warning icon and tooltip -->
+            <span v-if="league.id === 'nfl' && getNflCoverageCapped >= 80" class="absolute top-2 right-2 z-20">
+              <span class="relative group">
+                <span class="absolute left-1/2 -translate-x-1/2 mt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus:opacity-100 group-focus:pointer-events-auto transition-opacity duration-200 bg-amber-100 text-amber-700 border border-amber-400 rounded px-3 py-2 text-xs font-bold shadow-xl w-56 text-center">
+                  This bundle does NOT provide 100% live NFL coverage. You will miss FOX Sunday games and out-of-market games.
+                </span>
+              </span>
+            </span>
+          </div>
+          <div class="flex items-center justify-center text-xs font-extrabold font-mono text-center mb-1 mt-1 uppercase gap-2 w-full min-w-0 flex-wrap break-words">
+            <span class="text-2xl">{{ league.icon }}</span>
+            <span>{{ league.name }}</span>
+            <span v-if="league.id === 'nfl' && getNflCoverageCapped >= 80" class="ml-2 flex items-center">
+              <span class="relative group">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" tabindex="0">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span class="absolute left-1/2 -translate-x-1/2 mt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus:opacity-100 group-focus:pointer-events-auto transition-opacity duration-200 bg-amber-100 text-amber-700 border border-amber-400 rounded px-3 py-2 text-xs font-bold shadow-xl w-56 text-center z-50">
+                  This bundle does NOT provide 100% live NFL coverage. You will miss FOX Sunday games and out-of-market games.
+                </span>
+              </span>
+            </span>
+          </div>
+          <div v-if="getAggregatedCoverageNotes(league.id).length" class="mb-1">
+            <button @click="openLeagueModal(league)" class="text-xs text-blue-600 dark:text-blue-300 underline hover:no-underline focus:outline-none">
+              More Info
+            </button>
+          </div>
+          <div v-if="(item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) < 100" class="mt-1 text-xs text-orange-600 dark:text-orange-400">
+            <span v-if="showBudgetMessage">Your budget does not allow for full {{ league.name }} coverage. </span>
+            <span v-if="league.id === 'nfl'">Due to US broadcast rights and blackout rules, 100% live NFL coverage is not possible, even with all available services.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Services Included as Links -->
+      <div class="grid grid-cols-2 gap-2 mt-1 w-full max-w-full min-w-0">
+        <span class="text-base font-bold font-mono text-black dark:text-white col-span-2">Service Links:</span>
+        <template v-for="service in item.servicesInvolved" :key="service.id">
+          <span class="font-extrabold font-mono text-lg uppercase border-b-4 border-black dark:border-white pb-1 service-btn break-words w-full min-w-0">{{ service.name }}</span>
+        </template>
+      </div>
+
+      <!-- Details Section (only if there are details) -->
+      <div v-if="hasDetails" class="mt-2">
+        <button @click="detailsOpen = !detailsOpen"
+                class="inline-flex items-center gap-2 px-4 py-2 border-4 border-black bg-white text-black font-extrabold font-mono text-base shadow-none hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 mt-4 uppercase tracking-widest dark:bg-black dark:text-white dark:border-primary w-full justify-center"
+                :aria-expanded="detailsOpen"
+                aria-controls="bundle-details">
+          <svg v-if="!detailsOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+          </svg>
+          <span>{{ detailsOpen ? 'Hide Details' : 'Show Details' }}</span>
+        </button>
+        <transition name="fade-slide">
+          <div v-show="detailsOpen" id="bundle-details" class="mt-2">
+            <!-- Brutalist Coverage Table: Services as rows, Leagues as columns, checkmark if covered -->
+            <div class="overflow-x-auto">
+              <table class="min-w-full border-4 border-black dark:border-white bg-white dark:bg-black text-base font-mono brutalist-table">
+                <thead>
+                  <tr>
+                    <th class="p-4 font-extrabold text-left border-4 border-black dark:border-indigo-500 uppercase">Service</th>
+                    <th v-for="league in leaguesToShow" :key="league.id" class="p-4 font-extrabold text-center border-4 border-black dark:border-indigo-500 uppercase">
+                      <span class="flex flex-col items-center">
+                        <span class="text-2xl">{{ league.icon }}</span>
+                        <span class="text-xs mt-1">{{ league.name }}</span>
+                      </span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="service in item.servicesInvolved" :key="service.id">
+                    <td class="p-4 font-extrabold border-4 border-black dark:border-indigo-500 uppercase">{{ service.name }}</td>
+                    <td v-for="league in leaguesToShow" :key="service.id + '-' + league.id" class="p-4 text-center font-extrabold border-4 border-black dark:border-indigo-500">
+                      <span v-if="service.leagues && service.leagues[league.id] && service.leagues[league.id].coveragePercent > 0" class="inline-flex items-center justify-center text-3xl text-indigo-500">
+                        ✓
+                      </span>
+                      <span v-else class="inline-block w-8 h-8 text-2xl">—</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </transition>
+      </div>
+    </article>
+
+    <!-- Add modal markup at the end of the template -->
+    <transition name="fade">
+      <div v-if="modalLeague" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 w-full overflow-x-hidden">
+        <div class="relative w-full max-w-xs sm:max-w-md mx-2 p-4 sm:p-8 border-4 border-black dark:border-indigo-500 bg-white dark:bg-[#181824] rounded-lg shadow-2xl brutalist-modal box-border overflow-y-auto max-h-[90vh]">
+          <button @click="closeLeagueModal" class="absolute top-4 right-4 text-black dark:text-white font-extrabold text-2xl leading-none focus:outline-none">×</button>
+          <div class="flex flex-col sm:flex-row items-center gap-4 mb-6 w-full">
+            <span class="text-4xl">{{ modalLeague.icon }}</span>
+            <span class="text-2xl font-extrabold font-mono uppercase break-words w-full">{{ modalLeague.name }}</span>
+          </div>
+          <div>
+            <h2 class="text-lg font-extrabold font-mono uppercase mb-2 text-black dark:text-white break-words">Coverage Details</h2>
+            <ul class="list-disc ml-6 text-base font-mono text-black dark:text-white break-words">
+              <li v-for="note in getAggregatedCoverageNotes(modalLeague.id)" :key="note">{{ note }}</li>
+            </ul>
+          </div>
+          <div v-if="(item.selectedLeaguesCoveredDetails[modalLeague.id]?.coveragePercent || 0) < 100" class="mt-4 text-sm text-orange-600 dark:text-orange-400 font-mono break-words">
+            <span v-if="modalLeague.id === 'nfl'">Due to US broadcast rights and blackout rules, 100% live NFL coverage is not possible, even with all available services.</span>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </div>
 </template>
 
 <script setup>
@@ -218,12 +248,6 @@ const getAggregatedCoverageNotes = (leagueId) => {
     .filter(Boolean);
 };
 
-// Track expanded state for each league's More Info
-const expandedLeagues = ref({});
-const toggleLeagueInfo = (leagueId) => {
-  expandedLeagues.value[leagueId] = !expandedLeagues.value[leagueId];
-};
-
 // For animating the progress bars
 const animatedCoverage = ref({});
 const prevCoverage = ref({});
@@ -249,6 +273,14 @@ function animateCoverage() {
 }
 onMounted(animateCoverage);
 watch(leaguesWithCoverage, animateCoverage);
+
+const modalLeague = ref(null);
+function openLeagueModal(league) {
+  modalLeague.value = league;
+}
+function closeLeagueModal() {
+  modalLeague.value = null;
+}
 </script>
 
 <style scoped>
@@ -276,5 +308,19 @@ watch(leaguesWithCoverage, animateCoverage);
   /* background: #000 !important;
   color: #fff !important; */
   /* border-color: var(--color-primary, #a259ff) !important; */
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+@media (max-width: 640px) {
+  .brutalist-table th,
+  .brutalist-table td {
+    padding: 0.5rem !important;
+    font-size: 0.8rem !important;
+    word-break: break-word;
+  }
 }
 </style>
