@@ -20,20 +20,20 @@
 
       <!-- Expand/collapse toggle -->
       <div v-if="selectionCollapsed" class="flex justify-center mb-4">
-        <button @click="selectionCollapsed = false" class="px-4 py-2 border-4 border-black bg-primary text-black font-extrabold font-mono uppercase tracking-widest hover:bg-black hover:text-white dark:bg-indigo-500 dark:text-white dark:border-primary rounded-none">
+        <button @click="selectionCollapsed = false" class="px-6 py-3 bg-primary text-black font-extrabold font-mono uppercase tracking-widest rounded-lg shadow hover:bg-black hover:text-white transition text-xl">
           Expand Selections
         </button>
       </div>
 
       <!-- Selection Controls -->
       <transition name="fade-slide">
-        <section v-show="!selectionCollapsed" ref="selectionRef" class="bg-white border-4 border-black p-4 sm:p-6 mb-8 flex flex-col gap-6 mb-10 dark:bg-[#181824] dark:border-primary">
+        <section v-show="!selectionCollapsed" ref="selectionRef" class="bg-white border-4 border-black p-4 sm:p-6 mb-8 flex flex-col gap-6 mb-10 dark:bg-[#181824] dark:border-primary rounded-lg">
           <!-- League Selection -->
           <div>
             <h2 class="text-2xl font-bold font-mono text-primary mb-2 uppercase tracking-wider">Select Leagues:</h2>
             <div class="flex flex-wrap gap-2">
               <label v-for="league in allLeagues" :key="league.id"
-                class="flex items-center gap-2 px-3 py-2 border-2 border-black bg-white cursor-pointer select-none hover:bg-primary/10 transition dark:bg-[#232336] dark:border-primary dark:hover:bg-primary/20"
+                class="flex items-center gap-2 px-3 py-2 border-2 border-black bg-white cursor-pointer select-none hover:bg-primary/10 transition dark:bg-[#232336] dark:border-primary dark:hover:bg-primary/20 rounded-lg"
                 :class="{
                   'bg-primary text-black dark:bg-primary dark:text-black': selectedLeagueIds.includes(league.id),
                   'dark:bg-[#232336] dark:text-white': !selectedLeagueIds.includes(league.id)
@@ -51,7 +51,7 @@
           <div class="flex flex-col sm:flex-row items-center gap-4">
             <div class="flex-1">
               <label class="block text-base font-bold font-mono text-black mb-1 dark:text-white">Max Price: <span class="font-bold text-primary dark:text-accent-yellow">${{ maxPrice }}</span></label>
-              <input type="range" min="5" max="100" step="1" v-model="maxPrice" class="w-full accent-primary border-2 border-black dark:border-primary dark:bg-[#232336]" />
+              <input type="range" min="5" max="100" step="1" v-model="maxPrice" class="w-full accent-primary border-2 border-black dark:border-primary dark:bg-[#232336] rounded-lg" />
             </div>
             <label class="flex items-center gap-2 text-base font-bold font-mono text-black dark:text-white">
               <input type="checkbox" v-model="hardCap" class="accent-primary w-5 h-5 border-2 border-black dark:border-primary" />
@@ -62,7 +62,7 @@
             <button
               @click="handleBuild"
               :disabled="selectedLeagueIds.length === 0 || isLoading"
-              class="px-8 py-3 border-4 border-black bg-primary text-black font-extrabold font-mono text-xl uppercase tracking-widest transition disabled:opacity-40 disabled:cursor-not-allowed dark:bg-indigo-500 dark:text-white dark:border-primary"
+              class="px-8 py-3 border-4 border-black bg-primary text-black font-extrabold font-mono text-xl uppercase tracking-widest transition disabled:opacity-40 disabled:cursor-not-allowed dark:bg-indigo-500 dark:text-white dark:border-primary rounded-lg"
             >
               <span v-if="!isLoading">Build</span>
               <span v-else>Building your bundle...</span>
@@ -87,42 +87,46 @@
         <div v-if="hasBuilt && !isLoading" ref="resultsRef">
           <!-- Selections summary -->
           <div class="flex flex-wrap gap-2 justify-center mb-6">
-            <span v-for="league in selectedLeaguesSummary" :key="league.id" class="flex items-center gap-1 px-3 py-2 border-2 border-black bg-white dark:bg-[#232336] dark:border-primary text-lg font-bold font-mono uppercase">
+            <span v-for="league in selectedLeaguesSummary" :key="league.id" class="flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-100 border border-slate-300 text-base font-bold font-mono uppercase text-black shadow-sm">
               <span class="text-xl">{{ league.icon }}</span>
               <span>{{ league.name }}</span>
             </span>
           </div>
           <div v-if="selectedLeagueIds.length === 0">
-            <div class="max-w-2xl mx-auto bg-white border-4 border-black p-6 my-8 flex items-center justify-center dark:bg-[#181824] dark:border-primary">
+            <div class="max-w-2xl mx-auto bg-white border-4 border-black p-6 my-8 flex items-center justify-center dark:bg-[#181824] dark:border-primary rounded-lg">
               <p class="text-xl font-bold font-mono text-black text-center dark:text-white">
                 Select one or more leagues and set your max price to see the best streaming bundle for you.
               </p>
             </div>
           </div>
-          <div v-else-if="bestBundle">
-            <BundleCard :item="bestBundle" :selectedLeagues="selectedLeagues" :maxPrice="maxPrice" />
+          <div v-else-if="bundleToShow">
+            <div v-if="scenario === 'B' || scenario === 'D'" class="max-w-2xl mx-auto bg-red-600 text-white p-8 my-8 flex flex-col items-center justify-center rounded-lg shadow-lg">
+              <p class="text-xl font-extrabold font-mono text-white text-center uppercase mb-2">
+                No bundle covers all your selected leagues.<br />
+                The following leagues are <b>not covered</b>:
+              </p>
+              <ul class="flex flex-wrap gap-2 justify-center mt-2">
+                <li v-for="league in missingLeaguesBundle" :key="league.id" class="flex items-center gap-1 px-3 py-2 rounded-lg bg-white text-red-700 font-bold font-mono text-lg uppercase shadow">
+                  <span class="text-xl">{{ league.icon }}</span>
+                  <span>{{ league.name }}</span>
+                </li>
+              </ul>
+            </div>
+            <div v-if="scenario === 'C' || scenario === 'D'" class="flex flex-col items-center mb-2">
+              <span class="inline-block bg-accent-yellow text-black dark:text-white px-4 py-1 border-2 border-black dark:border-white text-base font-bold font-mono uppercase tracking-wider mb-2">
+                Bundle Over Budget
+              </span>
+              <span class="text-sm text-black dark:text-white font-mono text-center">This is the best bundle we could find, but it is <b>over your max price</b>. Try adjusting your budget or selections for a better match.</span>
+            </div>
+            <BundleCard :item="bundleToShow" :selectedLeagues="selectedLeagues" :maxPrice="maxPrice" class="rounded-lg" />
           </div>
           <div v-else>
-            <template v-if="anyLeagueHasZeroCoverage">
-              <div class="max-w-2xl mx-auto bg-white border-4 border-black p-8 my-8 flex items-center justify-center dark:bg-[#181824] dark:border-primary">
-                <p class="text-2xl font-extrabold font-mono text-red-700 text-center uppercase dark:text-accent-yellow">
-                  No streaming service covers all your selected leagues.<br />
-                  You may need a live TV service for full coverage.
-                </p>
-              </div>
-            </template>
-            <template v-else>
-              <p class="text-lg text-orange-500 text-center">No bundle found that matches your price range.<br />Try increasing your max price or selecting fewer leagues.</p>
-              <div v-if="closestBundle" class="mt-6">
-                <div class="flex flex-col items-center mb-2">
-                  <span class="inline-block bg-accent-yellow text-black dark:text-white px-4 py-1 border-2 border-black dark:border-white text-base font-bold font-mono uppercase tracking-wider mb-2">
-                    Closest Bundle (Over Budget)
-                  </span>
-                  <span class="text-sm text-black dark:text-white font-mono text-center">This is the closest bundle we could find, but it is <b>over your max price</b>. Try adjusting your budget or selections for a better match.</span>
-                </div>
-                <BundleCard :item="closestBundle" :selectedLeagues="selectedLeagues" :maxPrice="maxPrice" />
-              </div>
-            </template>
+            <div class="max-w-2xl mx-auto bg-white border-4 border-black p-8 my-8 flex items-center justify-center dark:bg-[#181824] dark:border-primary rounded-lg">
+              <p class="text-2xl font-extrabold font-mono text-red-700 text-center uppercase dark:text-accent-yellow">
+                No bundles found for your selections.<br />
+                Try selecting fewer leagues.
+              </p>
+            </div>
           </div>
         </div>
       </transition>
@@ -132,7 +136,7 @@
         <button
           v-if="hasBuilt && !isLoading"
           @click="scrollToSelection"
-          class="w-full relative px-4 py-4 border-b-4 border-black bg-white text-black font-extrabold font-mono text-lg shadow-none hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 uppercase tracking-widest dark:bg-black dark:text-white dark:border-primary text-center mt-6 mb-4"
+          class="w-full relative px-4 py-4 border-b-4 border-black bg-white text-black font-extrabold font-mono text-lg shadow-none hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 uppercase tracking-widest dark:bg-black dark:text-white dark:border-primary text-center mt-2 mb-4 rounded-lg"
           style="z-index:10;"
         >
           CHANGE SELECTIONS ^
@@ -212,150 +216,122 @@ watch(selectedLeagueIds, (val) => {
 
 function getBestGreedyBundle() {
   const services = streamingServicesData;
-  const leaguesToCover = new Set(selectedLeagueIds.value);
-  const selectedServices = [];
-  let totalPrice = 0;
-  let perLeagueCoverage = {};
-  let coveredLeagues = {};
-  let totalCoveragePercent = 0;
-  let budget = hardCap.value ? maxPrice.value : maxPrice.value + 5;
+  const selected = selectedLeagueIds.value;
+  if (!selected.length) return [];
+  const budget = hardCap.value ? maxPrice.value : maxPrice.value + 5;
 
-  // Track which leagues are already fully covered
-  const leagueCoverageSoFar = {};
-  selectedLeagueIds.value.forEach(id => { leagueCoverageSoFar[id] = 0; });
-
-  while (leaguesToCover.size > 0 && totalPrice < budget) {
-    // Find the service that provides the most additional coverage per dollar
-    let bestService = null;
-    let bestValue = 0;
-    let bestServiceCoverage = {};
-    for (const service of services) {
-      if (selectedServices.includes(service)) continue;
-      let addedCoverage = 0;
-      let serviceCoverage = {};
-      for (const leagueId of leaguesToCover) {
-        const league = service.leagues && service.leagues[leagueId];
-        if (league && league.coveragePercent && leagueCoverageSoFar[leagueId] < 100) {
-          const additional = Math.max(0, Math.min(league.coveragePercent, 100 - leagueCoverageSoFar[leagueId]));
-          addedCoverage += additional;
-          serviceCoverage[leagueId] = additional;
-        }
+  // Generate all possible non-empty combinations of services
+  function getAllCombinations(arr) {
+    const results = [];
+    const n = arr.length;
+    for (let i = 1; i < (1 << n); i++) {
+      const combo = [];
+      for (let j = 0; j < n; j++) {
+        if (i & (1 << j)) combo.push(arr[j]);
       }
-      const price = parseFloat((service.price || '').replace(/[^\d.]/g, '')) || 0;
-      if (price > 0 && addedCoverage > 0) {
-        const value = addedCoverage / price;
-        if (value > bestValue) {
-          bestValue = value;
-          bestService = service;
-          bestServiceCoverage = serviceCoverage;
-        }
-      }
+      results.push(combo);
     }
-    if (!bestService) break; // No more useful services
-    selectedServices.push(bestService);
-    totalPrice += parseFloat((bestService.price || '').replace(/[^\d.]/g, '')) || 0;
-    // Update league coverage so far
-    for (const leagueId of Object.keys(bestServiceCoverage)) {
-      leagueCoverageSoFar[leagueId] += bestServiceCoverage[leagueId];
-      leagueCoverageSoFar[leagueId] = Math.min(leagueCoverageSoFar[leagueId], 100);
-      if (leagueCoverageSoFar[leagueId] >= 100) {
-        leaguesToCover.delete(leagueId);
-      }
-    }
+    return results;
   }
 
-  // Build per-league and overall coverage
-  perLeagueCoverage = {};
-  coveredLeagues = {};
-  let coveredCount = 0;
-  selectedLeagueIds.value.forEach(id => {
-    perLeagueCoverage[id] = leagueCoverageSoFar[id] || 0;
-    if (perLeagueCoverage[id] > 0) {
-      // Find the first service that covers this league for description/channels
+  const allCombos = getAllCombinations(services);
+  const allLeagues = leaguesData.flatMap(cat => cat.leagues);
+  const bundles = allCombos.map(combo => {
+    let totalPrice = combo.reduce((sum, s) => sum + (parseFloat((s.price || '').replace(/[^\d.]/g, '')) || 0), 0);
+    let coveredLeagues = {};
+    let perLeagueCoverage = {};
+    let coveredCount = 0;
+    selected.forEach(id => {
+      let bestCoverage = 0;
       let leagueCoverageDesc = '';
       let leagueChannels = [];
-      for (const service of selectedServices) {
+      combo.forEach(service => {
         const league = service.leagues && service.leagues[id];
         if (league && league.coveragePercent) {
-          if (!leagueCoverageDesc && league.coverage) leagueCoverageDesc = league.coverage;
+          if (league.coveragePercent > bestCoverage) {
+            bestCoverage = league.coveragePercent;
+            leagueCoverageDesc = league.coverage;
+          }
           leagueChannels = leagueChannels.concat((league.channels || []).map(ch => `${ch} (on ${service.name})`));
         }
+      });
+      if (bestCoverage > 0) {
+        coveredLeagues[id] = {
+          name: allLeagues.find(l => l.id === id)?.name || id,
+          icon: allLeagues.find(l => l.id === id)?.icon || '?',
+          channels: leagueChannels,
+          coverage: leagueCoverageDesc,
+          coveragePercent: bestCoverage
+        };
+        coveredCount++;
       }
-      coveredLeagues[id] = {
-        name: allLeagues.find(l => l.id === id)?.name || id,
-        icon: allLeagues.find(l => l.id === id)?.icon || '?',
-        channels: leagueChannels,
-        coverage: leagueCoverageDesc,
-        coveragePercent: perLeagueCoverage[id]
-      };
-      coveredCount++;
-    }
-  });
-  totalCoveragePercent = selectedLeagueIds.value.length > 0
-    ? selectedLeagueIds.value.reduce((sum, id) => sum + (perLeagueCoverage[id] || 0), 0) / selectedLeagueIds.value.length
-    : 0;
-
-  if (
-    coveredCount > 0 &&
-    Object.values(perLeagueCoverage).every(v => v > 0) &&
-    totalPrice <= budget
-  ) {
-    return [{
-      id: `bundle_${selectedServices.map(s => s.id).join('_')}`,
+      perLeagueCoverage[id] = bestCoverage;
+    });
+    const totalCoveragePercent = selected.length > 0
+      ? selected.reduce((sum, id) => sum + (perLeagueCoverage[id] || 0), 0) / selected.length
+      : 0;
+    return {
+      id: `bundle_${combo.map(s => s.id).join('_')}`,
       type: 'bundle',
-      servicesInvolved: selectedServices,
-      displayName: selectedServices.length === 1 ? selectedServices[0].name : selectedServices.map(s => s.name).join(' + '),
+      servicesInvolved: combo,
+      displayName: combo.length === 1 ? combo[0].name : combo.map(s => s.name).join(' + '),
       totalNumericPrice: totalPrice,
       selectedLeaguesCoveredDetails: coveredLeagues,
       totalCoveredLeaguesCount: coveredCount,
       totalCoveragePercentByLeague: perLeagueCoverage,
-      overallCoveragePercent: totalCoveragePercent
-    }];
-  }
-  return [];
+      overallCoveragePercent: totalCoveragePercent,
+      isUnderBudget: totalPrice <= budget,
+      coversAll: coveredCount === selected.length
+    };
+  }).filter(b => b.totalCoveredLeaguesCount > 0);
+
+  // Sort bundles: most leagues covered, then under budget, then price, then coverage percent
+  bundles.sort((a, b) => {
+    if (b.totalCoveredLeaguesCount !== a.totalCoveredLeaguesCount) return b.totalCoveredLeaguesCount - a.totalCoveredLeaguesCount;
+    if (a.isUnderBudget !== b.isUnderBudget) return b.isUnderBudget - a.isUnderBudget;
+    if (a.totalNumericPrice !== b.totalNumericPrice) return a.totalNumericPrice - b.totalNumericPrice;
+    return (b.overallCoveragePercent || 0) - (a.overallCoveragePercent || 0);
+  });
+
+  // Find best for each scenario
+  const bestAllUnder = bundles.find(b => b.coversAll && b.isUnderBudget);
+  const bestPartialUnder = bundles.find(b => !b.coversAll && b.isUnderBudget);
+  const bestAllOver = bundles.find(b => b.coversAll && !b.isUnderBudget);
+  const bestPartialOver = bundles.find(b => !b.coversAll && !b.isUnderBudget);
+
+  // Return all for UI to pick
+  return [bestAllUnder, bestPartialUnder, bestAllOver, bestPartialOver].filter(Boolean);
 }
 
 const allBundles = computed(() => getBestGreedyBundle());
 
-const filteredBundles = computed(() => {
-  // Only show bundles that cover at least one selected league
-  return allBundles.value.filter(bundle => bundle.totalCoveredLeaguesCount > 0);
+// Pick the best bundle for each scenario
+const bestAllUnder = computed(() => allBundles.value.find(b => b.coversAll && b.isUnderBudget));
+const bestPartialUnder = computed(() => allBundles.value.find(b => !b.coversAll && b.isUnderBudget));
+const bestAllOver = computed(() => allBundles.value.find(b => b.coversAll && !b.isUnderBudget));
+const bestPartialOver = computed(() => allBundles.value.find(b => !b.coversAll && !b.isUnderBudget));
+
+// For UI: which scenario are we in?
+const scenario = computed(() => {
+  if (bestAllUnder.value) return 'A';
+  if (bestPartialUnder.value) return 'B';
+  if (bestAllOver.value) return 'C';
+  if (bestPartialOver.value) return 'D';
+  return 'E';
 });
 
-const priceCap = computed(() => hardCap.value ? maxPrice.value : maxPrice.value + 5);
-const inBudgetBundles = computed(() => filteredBundles.value.filter(bundle => bundle.totalNumericPrice <= priceCap.value));
-const outOfBudgetBundles = computed(() => filteredBundles.value.filter(bundle => bundle.totalNumericPrice > priceCap.value));
-
-const bestBundle = computed(() => {
-  if (inBudgetBundles.value.length === 0) return null;
-  let candidates = [...inBudgetBundles.value];
-  candidates.sort((a, b) => {
-    if ((b.overallCoveragePercent || 0) !== (a.overallCoveragePercent || 0)) {
-      return (b.overallCoveragePercent || 0) - (a.overallCoveragePercent || 0);
-    }
-    return a.totalNumericPrice - b.totalNumericPrice;
-  });
-  const best = candidates[0];
-  if (best) {
-    best.badge = 'Top Coverage';
-  }
-  return best;
+const bundleToShow = computed(() => {
+  if (scenario.value === 'A') return bestAllUnder.value;
+  if (scenario.value === 'B') return bestPartialUnder.value;
+  if (scenario.value === 'C') return bestAllOver.value;
+  if (scenario.value === 'D') return bestPartialOver.value;
+  return null;
 });
 
-const closestBundle = computed(() => {
-  if (inBudgetBundles.value.length > 0) return null;
-  if (outOfBudgetBundles.value.length === 0) return null;
-  let sorted = [...outOfBudgetBundles.value].sort((a, b) => {
-    if ((b.overallCoveragePercent || 0) !== (a.overallCoveragePercent || 0)) {
-      return (b.overallCoveragePercent || 0) - (a.overallCoveragePercent || 0);
-    }
-    return a.totalNumericPrice - b.totalNumericPrice;
-  });
-  const closest = sorted[0];
-  if (closest) {
-    closest.badge = 'Closest Match';
-  }
-  return closest;
+const missingLeaguesBundle = computed(() => {
+  if (!bundleToShow.value) return [];
+  const covered = Object.keys(bundleToShow.value.selectedLeaguesCoveredDetails || {});
+  return allLeagues.filter(l => selectedLeagueIds.value.includes(l.id) && !covered.includes(l.id));
 });
 
 const selectedLeagues = computed(() =>
@@ -365,20 +341,6 @@ const selectedLeagues = computed(() =>
 const selectedLeaguesSummary = computed(() =>
   allLeagues.filter(l => selectedLeagueIds.value.includes(l.id))
 );
-
-const anyLeagueHasZeroCoverage = computed(() => {
-  // For each selected league, check if any service or bundle covers it at all
-  if (!selectedLeagues.value.length) return false;
-  return selectedLeagues.value.some(league => {
-    // Check all services and bundles
-    const hasCoverage = allBundles.value.some(item => {
-      if (!item.selectedLeaguesCoveredDetails) return false;
-      const details = item.selectedLeaguesCoveredDetails[league.id];
-      return details && details.coveragePercent > 0;
-    });
-    return !hasCoverage;
-  });
-});
 </script>
 
 <style scoped>

@@ -1,40 +1,42 @@
 <template>
   <div class="relative w-full flex flex-col items-center">
-    <!-- Badge sits fully outside the card -->
-    <div v-if="item.badge" class="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-30 border-0">
-      <span v-if="item.badge === 'Best Value'"
-        class="bundle-badge bundle-badge-best inline-block px-6 py-2 border-4 border-indigo-white bg-accent-yellow bg-indigo-500 text-indigo-500 font-extrabold font-mono text-lg uppercase tracking-widest dark:bg-indigo-500 dark:text-white dark:border-white">
-        {{ item.badge }}
-      </span>
-      <span v-else
-        class="bundle-badge bundle-badge-main inline-block px-4 sm:px-6 py-2 border-4 border-white bg-indigo-500 text-white font-extrabold font-mono text-lg uppercase tracking-widest">
-        {{ item.badge }}
-      </span>
-    </div>
+    <!-- Badge inside the card, top center -->
     <article
-      class="shadow-none p-2 sm:p-4 md:p-6 mb-6 border-4 border-indigo-500 bg-white flex flex-col gap-3 relative text-base dark:bg-[#181824] dark:border-indigo-500 w-full max-w-full box-border overflow-x-hidden"
+      class="shadow-none p-2 sm:p-4 md:p-6 mb-6 border-4 border-indigo-500 bg-white flex flex-col gap-3 relative text-base dark:bg-[#181824] dark:border-indigo-500 w-full max-w-full box-border overflow-x-hidden rounded-lg"
       :class="{}"
-      style="margin-top: 2.5rem;"
+      style="margin-top: 1rem;"
     >
+      <div v-if="item.badge" class="flex justify-center mb-4 mt-2">
+        <span v-if="item.badge === 'Best Value'"
+          class="bundle-badge bundle-badge-best inline-block px-6 py-2 border-4 border-indigo-white bg-accent-yellow text-indigo-500 font-extrabold font-mono text-lg uppercase tracking-widest rounded-lg dark:bg-indigo-500 dark:text-white dark:border-white">
+          {{ item.badge }}
+        </span>
+        <span v-else
+          class="bundle-badge bundle-badge-main inline-block px-4 sm:px-6 py-2 border-4 border-white bg-indigo-500 text-white font-extrabold font-mono text-lg uppercase tracking-widest rounded-lg">
+          {{ item.badge }}
+        </span>
+      </div>
       <!-- Bundle Heading -->
       <div class="flex flex-row items-start justify-between mb-2 w-full min-w-0">
         <div class="flex flex-col gap-1 min-w-0 w-full">
           <div class="flex flex-row items-center gap-4 flex-wrap min-w-0 w-full">
-            <h3 class="text-2xl md:text-3xl font-extrabold font-mono text-black uppercase tracking-widest dark:text-white  min-w-0 w-3/3 mt-3">
+            <h3 class="text-2xl md:text-3xl font-extrabold font-mono text-center text-black uppercase tracking-widest dark:text-white min-w-0 w-3/3 mt-3">
               <template v-if="item.servicesInvolved.length > 1">Recommended Bundle</template>
               <template v-else>{{ item.servicesInvolved[0]?.name || item.displayName }}</template>
             </h3>
-            <div class="flex items-baseline gap-1 flex-shrink-0">
-              <span class="text-2xl md:text-3xl font-extrabold text-primary dark:text-accent-yellow whitespace-nowrap">${{ item.totalNumericPrice?.toFixed(2) }}</span>
-              <span class="text-xs font-mono text-black dark:text-white">/mo</span>
-            </div>
           </div>
-          <div v-if="whyThisBundle" class="flex items-center gap-2 mb-1 mt-1 w-full min-w-0 break-words">
-            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M13 16h-1v-4h-1m1-4h.01" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            <span class="text-base text-black dark:text-blue-300 font-mono font-bold break-words w-full min-w-0">{{ whyThisBundle }}</span>
+          <div class="flex items-baseline gap-2 flex-shrink-0 mb-2 mt-2 justify-center">
+            <span class="text-4xl md:text-5xl font-extrabold text-indigo-600 dark:text-accent-yellow whitespace-nowrap">${{ item.totalNumericPrice?.toFixed(2) }}</span>
+            <span class="text-base font-mono text-black dark:text-white">/mo</span>
+          </div>
+          <div v-if="whyThisBundle" class="flex flex-col items-center gap-2 mb-1 mt-1 w-full min-w-0 break-words text-center">
+            <span class="flex items-center gap-2 justify-center">
+              <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M13 16h-1v-4h-1m1-4h.01" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span class="text-base text-black dark:text-blue-300 font-mono font-bold break-words w-full min-w-0">{{ whyThisBundle }}</span>
+            </span>
           </div>
         </div>
       </div>
@@ -46,7 +48,7 @@
 
       <!-- Per-League Coverage (for all selected leagues) -->
       <div v-if="leaguesWithCoverage.length > 0" class="mt-2 mb-1 grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-2 w-full max-w-full min-w-0">
-        <div v-for="league in leaguesWithCoverage" :key="league.id" class="flex flex-col items-center flex-1 min-w-0 box-border">
+        <div v-for="league in leaguesWithCoverage" :key="league.id" class="flex flex-col items-center flex-1 min-w-0 box-border rounded-lg">
           <div class="relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 mb-2">
             <svg viewBox="0 0 48 48" class="absolute top-0 left-0 w-20 h-20 sm:w-24 sm:h-24">
               <circle cx="24" cy="24" r="20" fill="none" stroke="#e5e7eb" stroke-width="6" />
@@ -102,14 +104,14 @@
       <div class="grid grid-cols-2 gap-2 mt-1 w-full max-w-full min-w-0">
         <span class="text-base font-bold font-mono text-black dark:text-white col-span-2">Service Links:</span>
         <template v-for="service in item.servicesInvolved" :key="service.id">
-          <span class="font-extrabold font-mono text-lg uppercase border-b-4 border-black dark:border-white pb-1 service-btn break-words w-full min-w-0">{{ service.name }}</span>
+          <span class="font-extrabold font-mono text-lg uppercase border-b-4 border-black dark:border-white pb-1 service-btn break-words w-full min-w-0 rounded-lg">{{ service.name }}</span>
         </template>
       </div>
 
       <!-- Details Section (only if there are details) -->
       <div v-if="hasDetails" class="mt-2">
         <button @click="detailsOpen = !detailsOpen"
-                class="inline-flex items-center gap-2 px-4 py-2 border-4 border-black bg-white text-black font-extrabold font-mono text-base shadow-none hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 mt-4 uppercase tracking-widest dark:bg-black dark:text-white dark:border-primary w-full justify-center"
+                class="inline-flex items-center gap-2 px-4 py-2 border-4 border-black bg-white text-black font-extrabold font-mono text-base shadow-none hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 mt-4 uppercase tracking-widest dark:bg-black dark:text-white dark:border-primary w-full justify-center rounded-lg"
                 :aria-expanded="detailsOpen"
                 aria-controls="bundle-details">
           <svg v-if="!detailsOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
