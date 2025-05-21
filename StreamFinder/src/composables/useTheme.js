@@ -2,11 +2,15 @@ import { ref, watch } from 'vue';
 
 const THEME_KEY = 'streamfinder-theme';
 const theme = ref('dark'); // default
+const isManual = ref(false);
 
 function setHtmlClass(newTheme) {
   const html = document.documentElement;
   html.classList.remove('dark', 'light');
-  html.classList.add(newTheme);
+  if (newTheme === 'dark') {
+    html.classList.add('dark');
+  }
+  // For light, do not add any class
 }
 
 function detectSystemTheme() {
@@ -17,8 +21,10 @@ function loadTheme() {
   const saved = localStorage.getItem(THEME_KEY);
   if (saved === 'light' || saved === 'dark') {
     theme.value = saved;
+    isManual.value = true;
   } else {
     theme.value = detectSystemTheme() || 'dark';
+    isManual.value = false;
   }
   setHtmlClass(theme.value);
 }
@@ -26,6 +32,14 @@ function loadTheme() {
 function toggleTheme() {
   theme.value = theme.value === 'dark' ? 'light' : 'dark';
   localStorage.setItem(THEME_KEY, theme.value);
+  isManual.value = true;
+  setHtmlClass(theme.value);
+}
+
+function resetTheme() {
+  localStorage.removeItem(THEME_KEY);
+  isManual.value = false;
+  theme.value = detectSystemTheme();
   setHtmlClass(theme.value);
 }
 
@@ -51,6 +65,8 @@ export function useTheme() {
   return {
     theme,
     toggleTheme,
-    loadTheme
+    loadTheme,
+    resetTheme,
+    isManual
   };
 }

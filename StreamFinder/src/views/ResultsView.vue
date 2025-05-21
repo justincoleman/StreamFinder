@@ -1,34 +1,52 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-white via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+  <div class="min-h-screen bg-white dark:bg-slate-900">
     <div class="container mx-auto p-4 sm:p-6 max-w-full sm:max-w-2xl">
       <header class="mb-8 text-center">
-        <h1 class="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent mb-2">StreamFinder</h1>
-        <p class="text-base sm:text-lg text-slate-700 dark:text-slate-300 mt-2 leading-relaxed">
+        <h1 class="text-6xl sm:text-7xl font-extrabold font-mono text-black uppercase tracking-widest mb-2 border-b-8 border-primary inline-block pb-2 dark:text-white">STREAMFINDER</h1>
+        <p class="text-lg sm:text-xl font-bold font-mono text-black mt-4 leading-relaxed dark:text-white">
           Find the best streaming bundle for your favorite sports leagues—instantly.
         </p>
+        <!--
+        <div class="flex justify-center gap-4 mt-6">
+          <button @click="toggleTheme" class="px-4 py-2 border-4 border-black bg-white text-black font-extrabold font-mono uppercase tracking-widest hover:bg-black hover:text-white dark:bg-black dark:text-white dark:border-primary transition">
+            Toggle {{ theme === 'dark' ? 'Light' : 'Dark' }} Mode
+          </button>
+          <button v-if="isManual" @click="resetTheme" class="px-4 py-2 border-4 border-black bg-white text-black font-extrabold font-mono uppercase tracking-widest hover:bg-black hover:text-white dark:bg-black dark:text-white dark:border-primary transition">
+            Reset to System
+          </button>
+        </div>
+        -->
       </header>
 
       <!-- Selection Controls -->
-      <section class="bg-white/80 dark:bg-slate-700/80 border border-slate-200 dark:border-slate-700/50 rounded-2xl shadow-lg p-4 sm:p-6 mb-8 flex flex-col gap-6 mb-10">
+      <section class="bg-white border-4 border-black p-4 sm:p-6 mb-8 flex flex-col gap-6 mb-10 dark:bg-[#181824] dark:border-primary">
         <!-- League Selection -->
         <div>
-          <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">Select Leagues:</h2>
+          <h2 class="text-2xl font-bold font-mono text-primary mb-2 uppercase tracking-wider">Select Leagues:</h2>
           <div class="flex flex-wrap gap-2">
-            <label v-for="league in allLeagues" :key="league.id" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/50 cursor-pointer select-none hover:bg-blue-50 dark:hover:bg-blue-900/30 transition">
-              <input type="checkbox" v-model="selectedLeagueIds" :value="league.id" class="accent-blue-600 w-4 h-4" />
+            <label v-for="league in allLeagues" :key="league.id"
+              class="flex items-center gap-2 px-3 py-2 border-2 border-black bg-white cursor-pointer select-none hover:bg-primary/10 transition dark:bg-[#232336] dark:border-primary dark:hover:bg-primary/20"
+              :class="{
+                'bg-primary text-black dark:bg-primary dark:text-black': selectedLeagueIds.includes(league.id),
+                'dark:bg-[#232336] dark:text-white': !selectedLeagueIds.includes(league.id)
+              }"
+            >
+              <input type="checkbox" v-model="selectedLeagueIds" :value="league.id" class="accent-primary w-5 h-5 border-2 border-black dark:border-primary" />
               <span class="text-lg">{{ league.icon }}</span>
-              <span class="text-sm font-medium text-slate-700 dark:text-slate-200">{{ league.name }}</span>
+              <span class="text-base font-bold font-mono text-black dark:text-white"
+                :class="selectedLeagueIds.includes(league.id) ? 'text-black dark:text-black' : 'dark:text-white'"
+              >{{ league.name }}</span>
             </label>
           </div>
         </div>
         <!-- Price Slider & Hard Cap -->
         <div class="flex flex-col sm:flex-row items-center gap-4">
           <div class="flex-1">
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">Max Price: <span class="font-bold text-blue-600 dark:text-blue-300">${{ maxPrice }}</span></label>
-            <input type="range" min="5" max="100" step="1" v-model="maxPrice" class="w-full accent-blue-600" />
+            <label class="block text-base font-bold font-mono text-black mb-1 dark:text-white">Max Price: <span class="font-bold text-primary dark:text-accent-yellow">${{ maxPrice }}</span></label>
+            <input type="range" min="5" max="100" step="1" v-model="maxPrice" class="w-full accent-primary border-2 border-black dark:border-primary dark:bg-[#232336]" />
           </div>
-          <label class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200">
-            <input type="checkbox" v-model="hardCap" class="accent-blue-600 w-4 h-4" />
+          <label class="flex items-center gap-2 text-base font-bold font-mono text-black dark:text-white">
+            <input type="checkbox" v-model="hardCap" class="accent-primary w-5 h-5 border-2 border-black dark:border-primary" />
             Hard cap (don't show bundles above max price)
           </label>
         </div>
@@ -36,8 +54,8 @@
 
       <!-- Recommendation Area -->
       <div v-if="selectedLeagueIds.length === 0">
-        <div class="max-w-2xl mx-auto bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 rounded-2xl shadow-lg p-6 my-8 flex items-center justify-center">
-          <p class="text-lg text-slate-600 dark:text-slate-300 text-center font-medium">
+        <div class="max-w-2xl mx-auto bg-white border-4 border-black p-6 my-8 flex items-center justify-center dark:bg-[#181824] dark:border-primary">
+          <p class="text-xl font-bold font-mono text-black text-center dark:text-white">
             Select one or more leagues and set your max price to see the best streaming bundle for you.
           </p>
         </div>
@@ -47,8 +65,8 @@
       </div>
       <div v-else>
         <template v-if="anyLeagueHasZeroCoverage">
-          <div class="max-w-2xl mx-auto bg-orange-50 border border-orange-200 rounded-2xl shadow-lg p-6 my-8 flex items-center justify-center">
-            <p class="text-lg text-orange-700 text-center font-semibold">
+          <div class="max-w-2xl mx-auto bg-white border-4 border-black p-8 my-8 flex items-center justify-center dark:bg-[#181824] dark:border-primary">
+            <p class="text-2xl font-extrabold font-mono text-red-700 text-center uppercase dark:text-accent-yellow">
               No streaming service covers all your selected leagues.<br />
               You may need a live TV service for full coverage.
             </p>
@@ -58,7 +76,7 @@
           <p class="text-lg text-orange-500 text-center">No bundle found that matches your criteria.<br />Try increasing your max price or selecting fewer leagues.</p>
           <div v-if="closestBundle" class="mt-6">
             <div class="flex justify-center mb-2">
-              <span class="inline-block bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-4 py-1 rounded-full text-base font-semibold shadow-sm border border-orange-200 dark:border-orange-400/50">
+              <span class="inline-block bg-accent-yellow text-black dark:text-white px-4 py-1 border-2 border-black dark:border-white text-base font-bold font-mono uppercase tracking-wider">
                 Closest Match
               </span>
             </div>
@@ -75,9 +93,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import BundleCard from '@/components/BundleCard.vue';
-import { useTheme } from '@/composables/useTheme';
 import leaguesData from '@/data/leagues.json';
 import streamingServicesData from '@/data/streamingServicesData.json';
 
@@ -85,6 +102,25 @@ const allLeagues = leaguesData.flatMap(cat => cat.leagues);
 const selectedLeagueIds = ref([]);
 const maxPrice = ref(20);
 const hardCap = ref(false);
+
+// Persist league selections to localStorage
+const LEAGUE_KEY = 'streamfinder-leagues';
+
+onMounted(() => {
+  const saved = localStorage.getItem(LEAGUE_KEY);
+  if (saved) {
+    try {
+      const arr = JSON.parse(saved);
+      if (Array.isArray(arr)) selectedLeagueIds.value = arr;
+    } catch {
+      // Ignore JSON parse errors
+    }
+  }
+});
+
+watch(selectedLeagueIds, (val) => {
+  localStorage.setItem(LEAGUE_KEY, JSON.stringify(val));
+}, { deep: true });
 
 function getBestGreedyBundle() {
   const services = streamingServicesData;
@@ -249,8 +285,6 @@ const anyLeagueHasZeroCoverage = computed(() => {
     return !hasCoverage;
   });
 });
-
-useTheme();
 </script>
 
 <style scoped>

@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
-button:hover {
+button:hover, .service-btn {
     cursor: pointer;
+}
+
+header p {
+    text-wrap: pretty;
+    max-width: 70%;
+    margin: 0 auto;
+}
+
+.bundle-badge {
+    /* background: purple; */
+    /* color: white; */
 }

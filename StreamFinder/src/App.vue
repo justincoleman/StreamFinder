@@ -1,6 +1,6 @@
 // src/App.vue
 <template>
-  <div>
+  <div class="min-h-screen font-sans bg-white text-black dark:bg-[#10101a] dark:text-white">
     <RouterView />
   </div>
 </template>
