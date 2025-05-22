@@ -47,6 +47,63 @@
               </label>
             </div>
           </div>
+
+          <!-- League Preference Rankings -->
+          <div v-if="store.selectedLeagueIds.length > 0">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-2xl font-bold font-mono text-primary uppercase tracking-wider">League Importance:</h2>
+              <div class="flex gap-2">
+                <button @click="resetLeaguePreferences" class="px-3 py-1 border-2 border-black bg-white text-black font-bold font-mono text-sm hover:bg-black hover:text-white dark:bg-[#232336] dark:text-white dark:border-primary dark:hover:bg-primary/20 rounded-lg">
+                  Reset All
+                </button>
+                <div class="preset-menu-container relative">
+                  <button @click.stop="togglePresetMenu" class="px-3 py-1 border-2 border-black bg-white text-black font-bold font-mono text-sm hover:bg-black hover:text-white dark:bg-[#232336] dark:text-white dark:border-primary dark:hover:bg-primary/20 rounded-lg">
+                    Quick Rank
+                  </button>
+                  <div v-if="showPresetMenu" class="preset-menu-container absolute top-full right-0 mt-1 z-50 bg-white dark:bg-[#181824] border-2 border-black dark:border-primary rounded-lg shadow-lg p-2 w-48">
+                    <button
+                      v-for="preset in rankingPresets"
+                      :key="preset.name"
+                      @click.stop="applyPreset(preset.rankingRules)"
+                      class="block w-full text-left px-2 py-1 text-sm font-mono hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                    >
+                      {{ preset.name }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="text-sm font-mono text-black dark:text-white mb-4">
+              Drag the sliders to rank your leagues by importance. Higher importance leagues will get priority in bundle recommendations.
+            </p>
+            <div class="space-y-4">
+              <div v-for="league in store.selectedLeagues" :key="league.id" class="flex flex-col gap-2 p-3 border-2 border-black dark:border-primary rounded-lg">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">{{ league.icon }}</span>
+                  <span class="text-base font-bold font-mono text-black dark:text-white">{{ league.name }}</span>
+                  <div class="ml-auto flex items-center">
+                    <span class="font-mono font-bold" :class="getWeightColor(store.leaguePreferences[league.id] || 3)">
+                      {{ getWeightLabel(store.leaguePreferences[league.id] || 3) }}
+                    </span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono text-black dark:text-white">Low</span>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    step="1"
+                    :value="store.leaguePreferences[league.id] || 3"
+                    @input="updateLeaguePreference(league.id, $event.target.value)"
+                    class="w-full accent-primary dark:accent-indigo-500"
+                  />
+                  <span class="text-xs font-mono text-black dark:text-white">High</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="flex justify-center mt-6">
             <button
               @click="handleBuild"
@@ -79,10 +136,13 @@
       >
         <!-- Selected Leagues Summary -->
         <div v-if="bundleState.bundleToShow" class="flex flex-wrap gap-2 justify-center mb-6">
-          <span v-for="league in store.selectedLeagues" :key="league.id"
+          <span v-for="league in store.selectedLeaguesSortedByPreference" :key="league.id"
             class="flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-100 border border-slate-300 text-base font-bold font-mono uppercase text-black shadow-sm">
               <span class="text-xl">{{ league.icon }}</span>
               <span>{{ league.name }}</span>
+              <span class="ml-1" :class="getWeightColor(store.leaguePreferences[league.id] || 3)">
+                ({{ getWeightLabel(store.leaguePreferences[league.id] || 3) }})
+              </span>
             </span>
         </div>
 
@@ -103,7 +163,7 @@
         </div>
 
         <!-- Consolidated Status Message Area -->
-        <div v-if="bundleState.bundleToShow && (bundleState.removedServices.length > 0 || bundleState.missingLeaguesBundle.length > 0 || bundleState.scenario === 'C' || bundleState.scenario === 'D')"
+        <div v-if="bundleState.bundleToShow && !initialBuild && (bundleState.removedServices.length > 0 || bundleState.missingLeaguesBundle.length > 0 || bundleState.scenario === 'C' || bundleState.scenario === 'D')"
              class="max-w-2xl mx-auto p-4 my-4 border-2 rounded-lg"
              :class="{
                'bg-amber-50 border-amber-200 text-amber-800': bundleState.removedServices.length > 0 && !bundleState.missingLeaguesBundle.length,
@@ -207,7 +267,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, nextTick, onMounted, onUnmounted } from 'vue';
 import BundleCard from '@/components/BundleCard.vue';
 import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
 
@@ -237,11 +297,127 @@ const initialBuild = ref(true);
 // Add a new reactive property for the displayed price
 const displayPrice = ref(maxPrice.value);
 
+// Preset ranking menu
+const showPresetMenu = ref(false);
+const rankingPresets = [
+  {
+    name: "Football Focus",
+    rankingRules: {
+      nfl: 5,
+      ncaa_football: 4,
+      default: 2
+    }
+  },
+  {
+    name: "Basketball Focus",
+    rankingRules: {
+      nba: 5,
+      ncaa_basketball: 4,
+      default: 2
+    }
+  },
+  {
+    name: "Soccer Focus",
+    rankingRules: {
+      epl: 5,
+      mls: 4,
+      ucl: 5,
+      laliga: 4,
+      bundesliga: 4,
+      seriea: 4,
+      ligue1: 3,
+      uel: 3,
+      default: 1
+    }
+  },
+  {
+    name: "Major Sports",
+    rankingRules: {
+      nfl: 5,
+      nba: 5,
+      mlb: 5,
+      nhl: 4,
+      default: 2
+    }
+  },
+  {
+    name: "Equal Importance",
+    rankingRules: {
+      default: 3
+    }
+  }
+];
+
+function togglePresetMenu() {
+  showPresetMenu.value = !showPresetMenu.value;
+}
+
+function applyPreset(rankingRules) {
+  // Reset all preferences first
+  store.resetLeaguePreferences();
+
+  // Apply the rankings from the preset
+  store.selectedLeagueIds.forEach(leagueId => {
+    // If there's a specific rule for this league, use it; otherwise use the default
+    const weight = rankingRules[leagueId] !== undefined ? rankingRules[leagueId] : rankingRules.default || 3;
+    store.updateLeaguePreference(leagueId, weight);
+  });
+
+  // Close the menu
+  showPresetMenu.value = false;
+}
+
+// Helper functions for league importance ranking
+function updateLeaguePreference(leagueId, value) {
+  store.updateLeaguePreference(leagueId, parseInt(value, 10));
+}
+
+function resetLeaguePreferences() {
+  store.resetLeaguePreferences();
+}
+
+function getWeightLabel(weight) {
+  const labels = {
+    1: 'Very Low',
+    2: 'Low',
+    3: 'Medium',
+    4: 'High',
+    5: 'Very High'
+  };
+  return labels[weight] || 'Medium';
+}
+
+function getWeightColor(weight) {
+  const colors = {
+    1: 'text-gray-500',
+    2: 'text-blue-500',
+    3: 'text-green-500',
+    4: 'text-amber-500',
+    5: 'text-red-500'
+  };
+  return colors[weight] || 'text-green-500';
+}
+
 // When selections change, reset build state
 onMounted(() => {
   console.log('Component mounted');
   // Initialize with current selection
   currentSelectedLeagueIds.value = [...store.selectedLeagueIds];
+
+  // Add click event listener to close preset menu when clicking outside
+  document.addEventListener('click', handleDocumentClick);
+});
+
+function handleDocumentClick(event) {
+  // Check if the preset menu is open and the click is outside the menu
+  if (showPresetMenu.value && !event.target.closest('.preset-menu-container')) {
+    showPresetMenu.value = false;
+  }
+}
+
+// Clean up event listeners when component is unmounted
+onUnmounted(() => {
+  document.removeEventListener('click', handleDocumentClick);
 });
 
 // Reset build state when selections change
@@ -357,7 +533,7 @@ async function handleBuild() {
       bundleState.value = {
         optimalBundle: {...rawBundle},
         bundleToShow: formattedBundle,
-        scenario: determineScenario(formattedBundle),
+        scenario: 'A', // Always use scenario A on initial build
         missingLeaguesBundle: getMissingLeagues(formattedBundle),
         removedServices: []
       };
@@ -365,7 +541,8 @@ async function handleBuild() {
       // Set max price to bundle price only on initial build
       // Otherwise preserve user's existing max price preference
       if (initialBuild.value) {
-        maxPrice.value = Math.ceil(rawBundle.totalPrice);
+        // Set max price clearly above the bundle price to avoid floating point issues
+        maxPrice.value = Math.ceil(rawBundle.totalPrice + 1); // Add a full dollar to ensure it's clearly above
         displayPrice.value = maxPrice.value;
       } else {
         // If user's budget is higher than new bundle price, keep their setting
@@ -465,7 +642,7 @@ function updateBundleForPrice(newPrice) {
         ...bundleState.value,
         bundleToShow: fullBundle,
         removedServices: [],
-        scenario: determineScenario(fullBundle),
+        scenario: 'A', // Always set to scenario A when showing full bundle
         missingLeaguesBundle: getMissingLeagues(fullBundle)
       };
 
@@ -540,6 +717,9 @@ function updateBundleForPrice(newPrice) {
 function determineScenario(bundle) {
   if (!bundle) return 'E';
 
+  // Never show budget alerts during initial build
+  if (initialBuild.value) return 'A';
+
   // Count leagues with greater than 0% coverage
   const leaguesWithCoverage = Object.values(bundle.selectedLeaguesCoveredDetails || {})
     .filter(league => league.coveragePercent > 0)
@@ -548,16 +728,11 @@ function determineScenario(bundle) {
   const hasAllLeaguesCovered = leaguesWithCoverage === currentSelectedLeagueIds.value.length;
 
   // Check if bundle price is over the user's current max price setting
-  const isUnderBudget = bundle.totalNumericPrice <= maxPrice.value;
+  // Use a small epsilon value (0.01) to account for floating point precision issues
+  const epsilon = 0.01;
+  const isUnderBudget = bundle.totalNumericPrice <= (maxPrice.value + epsilon);
 
-  // If bundle's price is significantly above the max price (not just rounding difference)
-  // mark it as a budget alert case
-  if (bundle.totalNumericPrice > maxPrice.value + 0.5) {
-    // Budget alert scenarios
-    return hasAllLeaguesCovered ? 'C' : 'D';
-  }
-
-  // Normal scenarios
+  // Normal scenarios - simplified logic with better tolerance for floating point issues
   if (hasAllLeaguesCovered && isUnderBudget) return 'A';
   if (!hasAllLeaguesCovered && isUnderBudget) return 'B';
   if (hasAllLeaguesCovered && !isUnderBudget) return 'C';

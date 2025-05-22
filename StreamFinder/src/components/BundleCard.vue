@@ -51,10 +51,16 @@
         <div v-for="league in leaguesWithCoverage" :key="league.id" class="flex flex-col items-center flex-1 min-w-0 box-border rounded-lg">
           <div class="relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 mb-2">
             <svg viewBox="0 0 48 48" class="absolute top-0 left-0 w-20 h-20 sm:w-24 sm:h-24">
+              <defs>
+                <linearGradient id="coverage-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#3a186a" />
+                  <stop offset="100%" stop-color="#a259ff" />
+                </linearGradient>
+              </defs>
               <circle cx="24" cy="24" r="20" fill="none" stroke="#e5e7eb" stroke-width="6" />
               <circle
                 cx="24" cy="24" r="20" fill="none"
-                :stroke="(league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) === 100 ? '#a259ff' : '#111'"
+                :stroke="(league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) === 100 ? 'url(#coverage-gradient)' : 'url(#coverage-gradient)'"
                 stroke-width="6"
                 :stroke-dasharray="(league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) * 1.257 + ', 125.7'"
                 stroke-linecap="round"
@@ -142,6 +148,9 @@
                       <span class="flex flex-col items-center">
                         <span class="text-2xl">{{ league.icon }}</span>
                         <span class="text-xs mt-1">{{ league.name }}</span>
+                        <span class="text-xs mt-1" :class="getPreferenceColor(getLeaguePreference(league.id))">
+                          {{ getPreferenceLabel(getLeaguePreference(league.id)) }}
+                        </span>
                       </span>
                     </th>
                   </tr>
@@ -169,9 +178,14 @@
       <div v-if="modalLeague" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 w-full overflow-x-hidden">
         <div class="relative w-full max-w-xs sm:max-w-md mx-2 p-4 sm:p-8 border-4 border-black dark:border-indigo-500 bg-white dark:bg-[#181824] rounded-lg shadow-2xl brutalist-modal box-border overflow-y-auto max-h-[90vh]">
           <button @click="closeLeagueModal" class="absolute top-4 right-4 text-black dark:text-white font-extrabold text-2xl leading-none focus:outline-none">×</button>
-          <div class="flex flex-col sm:flex-row items-center gap-4 mb-6 w-full">
+          <div class="flex flex-col sm:flex-row items-center gap-4 mb-4 w-full">
             <span class="text-4xl">{{ modalLeague.icon }}</span>
-            <span class="text-2xl font-extrabold font-mono uppercase break-words w-full">{{ modalLeague.name }}</span>
+            <div class="flex flex-col items-center sm:items-start">
+              <span class="text-2xl font-extrabold font-mono uppercase break-words w-full">{{ modalLeague.name }}</span>
+              <span class="font-mono font-bold" :class="getPreferenceColor(getLeaguePreference(modalLeague.id))">
+                Importance: {{ getPreferenceLabel(getLeaguePreference(modalLeague.id)) }}
+              </span>
+            </div>
           </div>
           <div>
             <h2 class="text-lg font-extrabold font-mono uppercase mb-2 text-black dark:text-white break-words">Coverage Details</h2>
@@ -192,6 +206,9 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import affiliateLinks from '@/data/affiliateLinks.json';
 import serviceHomepages from '@/data/serviceHomepages.json';
+import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
+
+const store = useStreamingStoreWithPersistence();
 
 const props = defineProps({
   item: { type: Object, required: true },
@@ -204,7 +221,8 @@ const detailsOpen = ref(false);
 // Leagues actually covered by this bundle
 const leaguesToShow = computed(() => {
   // Only show leagues that are both selected and actually covered by the service
-  return props.selectedLeagues.filter(l => props.item.selectedLeaguesCoveredDetails && props.item.selectedLeaguesCoveredDetails[l.id]);
+  const selectedLeagues = store.selectedLeaguesSortedByPreference;
+  return selectedLeagues.filter(l => props.item.selectedLeaguesCoveredDetails && props.item.selectedLeaguesCoveredDetails[l.id]);
 });
 
 const hasDetails = computed(() => {
@@ -302,6 +320,33 @@ const hasAffiliateLinks = computed(() => {
 function getServiceLink(serviceId) {
   // First try to use affiliate link, then fall back to service homepage
   return affiliateLinks[serviceId] || serviceHomepages[serviceId] || '#';
+}
+
+// Helper functions to get league preference info
+function getLeaguePreference(leagueId) {
+  return store.leaguePreferences[leagueId] || 3; // Default to medium priority
+}
+
+function getPreferenceLabel(weight) {
+  const labels = {
+    1: 'Very Low',
+    2: 'Low',
+    3: 'Medium',
+    4: 'High',
+    5: 'Very High'
+  };
+  return labels[weight] || 'Medium';
+}
+
+function getPreferenceColor(weight) {
+  const colors = {
+    1: 'text-gray-500',
+    2: 'text-blue-500',
+    3: 'text-green-500',
+    4: 'text-amber-500',
+    5: 'text-red-500'
+  };
+  return colors[weight] || 'text-green-500';
 }
 </script>
 

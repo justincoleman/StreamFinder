@@ -62,6 +62,7 @@ export const useStreamingStore = defineStore('streaming', {
     subscribedServiceIds: [],
     expandedCategories: [],
     expandedServiceCategories: [],
+    leaguePreferences: {}, // New property for league preference weights (1-5, with 5 being highest priority)
   }),
 
   getters: {
@@ -101,7 +102,21 @@ export const useStreamingStore = defineStore('streaming', {
     },
 
     selectedLeagues(state) {
-      return this.allLeaguesFlat.filter(league => state.selectedLeagueIds.includes(league.id));
+      return this.allLeaguesFlat
+        .filter(league => state.selectedLeagueIds.includes(league.id))
+        .map(league => ({
+          ...league,
+          preferenceWeight: this.leaguePreferences[league.id] || 3 // Default weight is 3 (medium priority)
+        }));
+    },
+
+    selectedLeaguesSortedByPreference() {
+      // This getter provides leagues sorted by preference weight
+      // Use this for results display, not for interactive UI elements
+      return [...this.selectedLeagues].sort((a, b) => {
+        // Sort by preference weight (higher weights first)
+        return (this.leaguePreferences[b.id] || 3) - (this.leaguePreferences[a.id] || 3);
+      });
     },
 
     subscribedServicesDetails() {
@@ -235,7 +250,8 @@ export const useStreamingStore = defineStore('streaming', {
               : (coverage.count > 0 ? Infinity : 0),
             badge: null,
             redundantSubscriptions: [],
-            potentialSavings: 0
+            potentialSavings: 0,
+            weightedCoverageScore: 0 // Initialize the weighted coverage score
           };
 
           // Calculate newly covered leagues
@@ -246,17 +262,38 @@ export const useStreamingStore = defineStore('streaming', {
                 }
               });
 
+          // Calculate weighted coverage score based on league preferences
+          item.weightedCoverageScore = Object.keys(coverage.details).reduce((score, leagueId) => {
+            const weight = this.leaguePreferences[leagueId] || 3; // Default to medium priority (3)
+            const coveragePercent = coverage.details[leagueId].coveragePercent || 0;
+            return score + (weight * coveragePercent);
+          }, 0);
+
           return item;
         })
         .filter(Boolean);
 
       if (enrichedAndUniqueBundles.length === 0) return [];
 
-      // Sort bundles more efficiently
+      // Sort bundles by weighted coverage score first, then by price
       enrichedAndUniqueBundles.sort((a, b) => {
-        if (b.totalCoveredLeaguesCount !== a.totalCoveredLeaguesCount) return b.totalCoveredLeaguesCount - a.totalCoveredLeaguesCount;
-        if (a.totalNumericPrice !== b.totalNumericPrice) return a.totalNumericPrice - b.totalNumericPrice;
-        if (a.additionalNumericCost !== b.additionalNumericCost) return a.additionalNumericCost - b.additionalNumericCost;
+        // First by weighted coverage score (higher is better)
+        if (b.weightedCoverageScore !== a.weightedCoverageScore)
+          return b.weightedCoverageScore - a.weightedCoverageScore;
+
+        // Then by total coverage count
+        if (b.totalCoveredLeaguesCount !== a.totalCoveredLeaguesCount)
+          return b.totalCoveredLeaguesCount - a.totalCoveredLeaguesCount;
+
+        // Then by price (lower is better)
+        if (a.totalNumericPrice !== b.totalNumericPrice)
+          return a.totalNumericPrice - b.totalNumericPrice;
+
+        // Then by additional cost
+        if (a.additionalNumericCost !== b.additionalNumericCost)
+          return a.additionalNumericCost - b.additionalNumericCost;
+
+        // Finally by number of services
         return a.servicesInvolved.length - b.servicesInvolved.length;
       });
 
@@ -379,8 +416,17 @@ export const useStreamingStore = defineStore('streaming', {
   actions: {
     toggleLeagueSelection(leagueId) {
       const index = this.selectedLeagueIds.indexOf(leagueId);
-      if (index > -1) this.selectedLeagueIds.splice(index, 1);
-      else this.selectedLeagueIds.push(leagueId);
+      if (index > -1) {
+        // Remove the league from the selected list
+        this.selectedLeagueIds.splice(index, 1);
+
+        // Optionally, clean up the preference when a league is unselected
+        // Uncomment this if you want to reset preference when league is deselected
+        // delete this.leaguePreferences[leagueId];
+      } else {
+        // Add the league to the selected list
+        this.selectedLeagueIds.push(leagueId);
+      }
     },
     toggleServiceSubscription(serviceId) {
       const index = this.subscribedServiceIds.indexOf(serviceId);
@@ -414,6 +460,22 @@ export const useStreamingStore = defineStore('streaming', {
     unselectAllServices() {
       this.subscribedServiceIds = [];
     },
+    // New action to update league preference weight
+    updateLeaguePreference(leagueId, weight) {
+      // Weight should be between 1-5, with 5 being highest priority
+      this.leaguePreferences[leagueId] = Math.max(1, Math.min(5, weight));
+    },
+    // Reset all league preferences to medium (3)
+    resetLeaguePreferences() {
+      this.leaguePreferences = {};
+    },
+    // Set all selected leagues to the same preference
+    setAllLeaguePreferences(weight) {
+      const normalizedWeight = Math.max(1, Math.min(5, weight));
+      this.selectedLeagueIds.forEach(leagueId => {
+        this.leaguePreferences[leagueId] = normalizedWeight;
+      });
+    },
     /**
      * Build the optimal bundle for the selected leagues (max total summed coverage, regardless of price)
      */
@@ -435,7 +497,7 @@ export const useStreamingStore = defineStore('streaming', {
         return results;
       }
       let bestBundle = null;
-      let bestCoverage = -1;
+      let bestWeightedCoverage = -1;
       let bestPrice = Infinity;
       let bestServiceCount = Infinity;
       const combos = getAllCombinations(allServices);
@@ -443,8 +505,12 @@ export const useStreamingStore = defineStore('streaming', {
         let totalPrice = combo.reduce((sum, s) => sum + (s.numericPrice || 0), 0);
         let perLeagueCoverage = {};
         let totalCoverage = 0;
+        let totalWeightedCoverage = 0;
         let coveredLeagues = {};
         for (const leagueId of selectedLeagueIds) {
+          // Get the league preference weight (1-5, default 3)
+          const preferenceWeight = this.leaguePreferences[leagueId] || 3;
+
           // Sum all coverage for this league from all services, capped at 100%
           let sumCoverage = 0;
           let leagueCoverageDesc = '';
@@ -460,6 +526,9 @@ export const useStreamingStore = defineStore('streaming', {
           sumCoverage = Math.min(sumCoverage, 100);
           perLeagueCoverage[leagueId] = sumCoverage;
           totalCoverage += sumCoverage;
+          // Apply the preference weight to the coverage
+          totalWeightedCoverage += sumCoverage * preferenceWeight;
+
           if (sumCoverage > 0) {
             const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
             coveredLeagues[leagueId] = {
@@ -471,13 +540,13 @@ export const useStreamingStore = defineStore('streaming', {
             };
           }
         }
-        // Prefer: more total coverage, then lower price, then fewer services
+        // Prefer: more weighted total coverage, then lower price, then fewer services
         if (
-          totalCoverage > bestCoverage ||
-          (totalCoverage === bestCoverage && totalPrice < bestPrice) ||
-          (totalCoverage === bestCoverage && totalPrice === bestPrice && combo.length < bestServiceCount)
+          totalWeightedCoverage > bestWeightedCoverage ||
+          (totalWeightedCoverage === bestWeightedCoverage && totalPrice < bestPrice) ||
+          (totalWeightedCoverage === bestWeightedCoverage && totalPrice === bestPrice && combo.length < bestServiceCount)
         ) {
-          bestCoverage = totalCoverage;
+          bestWeightedCoverage = totalWeightedCoverage;
           bestPrice = totalPrice;
           bestServiceCount = combo.length;
           bestBundle = {
@@ -485,7 +554,8 @@ export const useStreamingStore = defineStore('streaming', {
             totalPrice,
             perLeagueCoverage,
             totalCoverage,
-            coveredLeagues
+            coveredLeagues,
+            totalWeightedCoverage
           };
         }
       }
@@ -510,6 +580,28 @@ export const useStreamingStore = defineStore('streaming', {
         const affordableServices = this.processedAvailableServicesFlat
           .filter(s => s.numericPrice <= maxPrice)
           .sort((a, b) => {
+            // Calculate weighted league coverage for each service based on preferences
+            const aWeightedCoverage = selectedLeagueIds.reduce((sum, lid) => {
+              if (a.leagues && a.leagues[lid]) {
+                const weight = this.leaguePreferences[lid] || 3; // Default to medium priority
+                return sum + (weight * (a.leagues[lid].coveragePercent || 0));
+              }
+              return sum;
+            }, 0);
+
+            const bWeightedCoverage = selectedLeagueIds.reduce((sum, lid) => {
+              if (b.leagues && b.leagues[lid]) {
+                const weight = this.leaguePreferences[lid] || 3; // Default to medium priority
+                return sum + (weight * (b.leagues[lid].coveragePercent || 0));
+              }
+              return sum;
+            }, 0);
+
+            // First sort by weighted coverage, then by raw league count, then by price
+            if (aWeightedCoverage !== bWeightedCoverage) {
+              return bWeightedCoverage - aWeightedCoverage;
+            }
+
             // Count leagues covered by each service
             const aLeaguesCovered = selectedLeagueIds.filter(lid => a.leagues && a.leagues[lid]).length;
             const bLeaguesCovered = selectedLeagueIds.filter(lid => b.leagues && b.leagues[lid]).length;
@@ -524,14 +616,17 @@ export const useStreamingStore = defineStore('streaming', {
           // Calculate coverage stats
           let perLeagueCoverage = {};
           let totalCoverage = 0;
+          let totalWeightedCoverage = 0;
           let coveredLeagues = {};
 
           for (const leagueId of selectedLeagueIds) {
             const league = bestService.leagues && bestService.leagues[leagueId];
             const coveragePercent = league ? league.coveragePercent || 0 : 0;
+            const preferenceWeight = this.leaguePreferences[leagueId] || 3; // Default to medium priority
 
             perLeagueCoverage[leagueId] = coveragePercent;
             totalCoverage += coveragePercent;
+            totalWeightedCoverage += coveragePercent * preferenceWeight;
 
             if (coveragePercent > 0) {
               const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
@@ -550,6 +645,7 @@ export const useStreamingStore = defineStore('streaming', {
             totalPrice: bestService.numericPrice,
             perLeagueCoverage,
             totalCoverage,
+            totalWeightedCoverage,
             coveredLeagues
           };
         }
@@ -559,8 +655,11 @@ export const useStreamingStore = defineStore('streaming', {
         let totalPrice = services.reduce((sum, s) => sum + (s.numericPrice || 0), 0);
         let perLeagueCoverage = {};
         let totalCoverage = 0;
+        let totalWeightedCoverage = 0;
         let coveredLeagues = {};
         for (const leagueId of selectedLeagueIds) {
+          const preferenceWeight = this.leaguePreferences[leagueId] || 3; // Default to medium priority
+
           let sumCoverage = 0;
           let leagueCoverageDesc = '';
           let leagueChannels = [];
@@ -575,6 +674,8 @@ export const useStreamingStore = defineStore('streaming', {
           sumCoverage = Math.min(sumCoverage, 100);
           perLeagueCoverage[leagueId] = sumCoverage;
           totalCoverage += sumCoverage;
+          totalWeightedCoverage += sumCoverage * preferenceWeight;
+
           if (sumCoverage > 0) {
             const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
             coveredLeagues[leagueId] = {
@@ -586,23 +687,30 @@ export const useStreamingStore = defineStore('streaming', {
             };
           }
         }
-        return { services, totalPrice, perLeagueCoverage, totalCoverage, coveredLeagues };
+        return { services, totalPrice, perLeagueCoverage, totalCoverage, totalWeightedCoverage, coveredLeagues };
       }
+
+      // Bind this context for getBundleStats
+      const boundGetBundleStats = getBundleStats.bind(this);
+
       // Remove services until under budget (with tolerance)
       while (currentServices.length > 0) {
-        let stats = getBundleStats(currentServices);
+        let stats = boundGetBundleStats(currentServices);
         if (stats.totalPrice <= maxPrice + tolerance) {
           return stats;
         }
-        // Find the service whose removal reduces total coverage the least
-        let minImpact = Infinity;
+        // Find the service whose removal reduces weighted total coverage the least
+        let minWeightedImpact = Infinity;
         let serviceToRemove = null;
         for (const service of currentServices) {
           let testServices = currentServices.filter(s => s.id !== service.id);
-          let testStats = getBundleStats(testServices);
-          let impact = stats.totalCoverage - testStats.totalCoverage;
-          if (impact < minImpact) {
-            minImpact = impact;
+          let testStats = boundGetBundleStats(testServices);
+
+          // Calculate weighted impact on coverage (considering preferences)
+          let weightedImpact = stats.totalWeightedCoverage - testStats.totalWeightedCoverage;
+
+          if (weightedImpact < minWeightedImpact) {
+            minWeightedImpact = weightedImpact;
             serviceToRemove = service;
           }
         }
@@ -621,13 +729,18 @@ export const useStreamingStore = defineStore('streaming', {
 // --- LocalStorage Persistence ---
 const LS_LEAGUES = 'sf_selectedLeagueIds';
 const LS_SERVICES = 'sf_subscribedServiceIds';
+const LS_PREFERENCES = 'sf_leaguePreferences';
 
 function hydrateStoreFromLocalStorage(store) {
   try {
     const leagues = JSON.parse(localStorage.getItem(LS_LEAGUES));
     if (Array.isArray(leagues)) store.selectedLeagueIds = leagues;
+
     const services = JSON.parse(localStorage.getItem(LS_SERVICES));
     if (Array.isArray(services)) store.subscribedServiceIds = services;
+
+    const preferences = JSON.parse(localStorage.getItem(LS_PREFERENCES));
+    if (preferences && typeof preferences === 'object') store.leaguePreferences = preferences;
   } catch { /* ignore */ }
 }
 
@@ -635,8 +748,13 @@ function setupLocalStoragePersistence(store) {
   watch(() => store.selectedLeagueIds, (val) => {
     localStorage.setItem(LS_LEAGUES, JSON.stringify(val));
   }, { deep: true });
+
   watch(() => store.subscribedServiceIds, (val) => {
     localStorage.setItem(LS_SERVICES, JSON.stringify(val));
+  }, { deep: true });
+
+  watch(() => store.leaguePreferences, (val) => {
+    localStorage.setItem(LS_PREFERENCES, JSON.stringify(val));
   }, { deep: true });
 }
 

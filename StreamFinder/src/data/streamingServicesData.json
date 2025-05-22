@@ -105,7 +105,12 @@
     "serviceCategory": "League/Sport Specific",
     "price": "$24.99/mo or $149.99/yr (All Teams, approx)",
     "leagues": {
-      "mlb": { "channels": ["All out-of-market MLB games (blackouts apply for local teams)"], "coverage": "All MLB games", "coveragePercent": 100 }
+      "mlb": {
+        "channels": ["All out-of-market MLB games (blackouts apply for local teams)", "Apple TV+ required for Friday Night Baseball"],
+        "coverage": "Covers most MLB games, but Friday Night Baseball games are exclusive to Apple TV+ (~90% of all MLB games)",
+        "coveragePercent": 90,
+        "notes": "Does NOT include Friday Night Baseball games, which are exclusive to Apple TV+. Local blackouts are a key factor."
+      }
     },
     "notes": "Stream out-of-market MLB games. Local blackouts are a key factor."
   },

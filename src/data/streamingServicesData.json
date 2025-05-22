@@ -1,0 +1,21 @@
+[
+  {
+    "id": "hulu",
+    "name": "Hulu",
+    "serviceCategory": "On-Demand Streaming",
+    "price": "$7.99/mo (ad-supported)",
+    "leagues": {},
+    "notes": "On-demand only. No live sports coverage, but includes sports documentaries and some exclusive content."
+  },
+  {
+    "id": "max_br_sports",
+    "name": "Max (B/R Sports Add-On)",
+    "serviceCategory": "Sport Specific & Add-ons",
+    "price": "$9.99/mo (Add-on to Max subscription)",
+    "leagues": {
+      "nba": { "channels": ["Games on TNT", "NBA TV games (select)"], "coverage": "TNT broadcasts and select NBA TV games (~25% of all NBA games)", "coveragePercent": 25 },
+      "nhl": { "channels": ["Games on TNT", "NHL Network games (select)"], "coverage": "TNT broadcasts and select NHL Network games (~25% of all NHL games)", "coveragePercent": 25 }
+    },
+    "notes": "Sports add-on for Max. Carries games broadcast on Turner Sports networks."
+  }
+]
