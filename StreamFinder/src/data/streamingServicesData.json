@@ -94,8 +94,8 @@
     "serviceCategory": "Sport Specific & Add-ons",
     "price": "$9.99/mo (Add-on to Max subscription)",
     "leagues": {
-      "nba": { "channels": ["Games on TNT", "NBA TV games (select)"], "coverage": "All NBA games", "coveragePercent": 100 },
-      "nhl": { "channels": ["Games on TNT", "NHL Network games (select)"], "coverage": "All NHL games", "coveragePercent": 100 }
+      "nba": { "channels": ["Games on TNT", "NBA TV games (select)"], "coverage": "TNT broadcasts and select NBA TV games (~25% of all NBA games)", "coveragePercent": 25 },
+      "nhl": { "channels": ["Games on TNT", "NHL Network games (select)"], "coverage": "TNT broadcasts and select NHL Network games (~25% of all NHL games)", "coveragePercent": 25 }
     },
     "notes": "Sports add-on for Max. Carries games broadcast on Turner Sports networks."
   },
@@ -115,7 +115,7 @@
     "serviceCategory": "League/Sport Specific",
     "price": "$14.99/mo or $99.99/yr (approx)",
     "leagues": {
-      "nba": { "channels": ["All out-of-market NBA games (blackouts apply for local & national games)"], "coverage": "All NBA games", "coveragePercent": 100 }
+      "nba": { "channels": ["All out-of-market NBA games (blackouts apply for local & national games)"], "coverage": "Out-of-market NBA games with blackouts for local and national broadcasts (~80% of all NBA games)", "coveragePercent": 80 }
     },
     "notes": "Stream out-of-market NBA games. Local and national blackouts apply."
   },
