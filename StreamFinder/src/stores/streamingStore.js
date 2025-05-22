@@ -413,6 +413,204 @@ export const useStreamingStore = defineStore('streaming', {
     },
     unselectAllServices() {
       this.subscribedServiceIds = [];
+    },
+    /**
+     * Build the optimal bundle for the selected leagues (max total summed coverage, regardless of price)
+     */
+    buildOptimalBundle(selectedLeagueIds) {
+      const allLeaguesFlat = this.allLeaguesFlat;
+      const allServices = this.processedAvailableServicesFlat;
+      if (!selectedLeagueIds.length) return null;
+      // Generate all non-empty combinations of services
+      function getAllCombinations(arr) {
+        const results = [];
+        const n = arr.length;
+        for (let i = 1; i < (1 << n); i++) {
+          const combo = [];
+          for (let j = 0; j < n; j++) {
+            if (i & (1 << j)) combo.push(arr[j]);
+          }
+          results.push(combo);
+        }
+        return results;
+      }
+      let bestBundle = null;
+      let bestCoverage = -1;
+      let bestPrice = Infinity;
+      let bestServiceCount = Infinity;
+      const combos = getAllCombinations(allServices);
+      for (const combo of combos) {
+        let totalPrice = combo.reduce((sum, s) => sum + (s.numericPrice || 0), 0);
+        let perLeagueCoverage = {};
+        let totalCoverage = 0;
+        let coveredLeagues = {};
+        for (const leagueId of selectedLeagueIds) {
+          // Sum all coverage for this league from all services, capped at 100%
+          let sumCoverage = 0;
+          let leagueCoverageDesc = '';
+          let leagueChannels = [];
+          for (const service of combo) {
+            const league = service.leagues && service.leagues[leagueId];
+            if (league && league.coveragePercent) {
+              sumCoverage += league.coveragePercent;
+              if (!leagueCoverageDesc && league.coverage) leagueCoverageDesc = league.coverage;
+              leagueChannels = leagueChannels.concat((league.channels || []).map(ch => `${ch} (on ${service.name})`));
+            }
+          }
+          sumCoverage = Math.min(sumCoverage, 100);
+          perLeagueCoverage[leagueId] = sumCoverage;
+          totalCoverage += sumCoverage;
+          if (sumCoverage > 0) {
+            const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
+            coveredLeagues[leagueId] = {
+              name: leagueInfo ? leagueInfo.name : leagueId,
+              icon: leagueInfo ? leagueInfo.icon : '?',
+              channels: leagueChannels,
+              coverage: leagueCoverageDesc,
+              coveragePercent: sumCoverage
+            };
+          }
+        }
+        // Prefer: more total coverage, then lower price, then fewer services
+        if (
+          totalCoverage > bestCoverage ||
+          (totalCoverage === bestCoverage && totalPrice < bestPrice) ||
+          (totalCoverage === bestCoverage && totalPrice === bestPrice && combo.length < bestServiceCount)
+        ) {
+          bestCoverage = totalCoverage;
+          bestPrice = totalPrice;
+          bestServiceCount = combo.length;
+          bestBundle = {
+            services: combo,
+            totalPrice,
+            perLeagueCoverage,
+            totalCoverage,
+            coveredLeagues
+          };
+        }
+      }
+      if (!bestBundle) return null;
+      return bestBundle;
+    },
+
+    /**
+     * Adjust a bundle to fit under a new max price by removing services with least impact on total coverage
+     * Returns a new bundle object or null if impossible
+     */
+    adjustBundleForBudget(bundle, maxPrice, tolerance = 2) {
+      if (!bundle || !bundle.services || bundle.services.length === 0) return null;
+      let currentServices = [...bundle.services];
+      let allLeaguesFlat = this.allLeaguesFlat;
+      let selectedLeagueIds = Object.keys(bundle.perLeagueCoverage);
+
+      // If our budget is very low (like $5), first try showing the individual
+      // services that fit within that budget, in order of best coverage
+      if (maxPrice <= 6 && this.processedAvailableServicesFlat) {
+        // Find services that are under budget
+        const affordableServices = this.processedAvailableServicesFlat
+          .filter(s => s.numericPrice <= maxPrice)
+          .sort((a, b) => {
+            // Count leagues covered by each service
+            const aLeaguesCovered = selectedLeagueIds.filter(lid => a.leagues && a.leagues[lid]).length;
+            const bLeaguesCovered = selectedLeagueIds.filter(lid => b.leagues && b.leagues[lid]).length;
+            return bLeaguesCovered - aLeaguesCovered || a.numericPrice - b.numericPrice;
+          });
+
+        // If we found any affordable services, create a bundle with the best one
+        if (affordableServices.length > 0) {
+          // Get the best affordable service
+          const bestService = affordableServices[0];
+
+          // Calculate coverage stats
+          let perLeagueCoverage = {};
+          let totalCoverage = 0;
+          let coveredLeagues = {};
+
+          for (const leagueId of selectedLeagueIds) {
+            const league = bestService.leagues && bestService.leagues[leagueId];
+            const coveragePercent = league ? league.coveragePercent || 0 : 0;
+
+            perLeagueCoverage[leagueId] = coveragePercent;
+            totalCoverage += coveragePercent;
+
+            if (coveragePercent > 0) {
+              const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
+              coveredLeagues[leagueId] = {
+                name: leagueInfo ? leagueInfo.name : leagueId,
+                icon: leagueInfo ? leagueInfo.icon : '?',
+                channels: league.channels || [],
+                coverage: league.coverage || "",
+                coveragePercent
+              };
+            }
+          }
+
+          return {
+            services: [bestService],
+            totalPrice: bestService.numericPrice,
+            perLeagueCoverage,
+            totalCoverage,
+            coveredLeagues
+          };
+        }
+      }
+
+      function getBundleStats(services) {
+        let totalPrice = services.reduce((sum, s) => sum + (s.numericPrice || 0), 0);
+        let perLeagueCoverage = {};
+        let totalCoverage = 0;
+        let coveredLeagues = {};
+        for (const leagueId of selectedLeagueIds) {
+          let sumCoverage = 0;
+          let leagueCoverageDesc = '';
+          let leagueChannels = [];
+          for (const service of services) {
+            const league = service.leagues && service.leagues[leagueId];
+            if (league && league.coveragePercent) {
+              sumCoverage += league.coveragePercent;
+              if (!leagueCoverageDesc && league.coverage) leagueCoverageDesc = league.coverage;
+              leagueChannels = leagueChannels.concat((league.channels || []).map(ch => `${ch} (on ${service.name})`));
+            }
+          }
+          sumCoverage = Math.min(sumCoverage, 100);
+          perLeagueCoverage[leagueId] = sumCoverage;
+          totalCoverage += sumCoverage;
+          if (sumCoverage > 0) {
+            const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
+            coveredLeagues[leagueId] = {
+              name: leagueInfo ? leagueInfo.name : leagueId,
+              icon: leagueInfo ? leagueInfo.icon : '?',
+              channels: leagueChannels,
+              coverage: leagueCoverageDesc,
+              coveragePercent: sumCoverage
+            };
+          }
+        }
+        return { services, totalPrice, perLeagueCoverage, totalCoverage, coveredLeagues };
+      }
+      // Remove services until under budget (with tolerance)
+      while (currentServices.length > 0) {
+        let stats = getBundleStats(currentServices);
+        if (stats.totalPrice <= maxPrice + tolerance) {
+          return stats;
+        }
+        // Find the service whose removal reduces total coverage the least
+        let minImpact = Infinity;
+        let serviceToRemove = null;
+        for (const service of currentServices) {
+          let testServices = currentServices.filter(s => s.id !== service.id);
+          let testStats = getBundleStats(testServices);
+          let impact = stats.totalCoverage - testStats.totalCoverage;
+          if (impact < minImpact) {
+            minImpact = impact;
+            serviceToRemove = service;
+          }
+        }
+        if (!serviceToRemove) break;
+        currentServices = currentServices.filter(s => s.id !== serviceToRemove.id);
+      }
+      // If we get here, no bundle fits the budget
+      return null;
     }
   },
 
