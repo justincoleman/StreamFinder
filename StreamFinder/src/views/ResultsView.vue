@@ -220,6 +220,7 @@ const isLoading = ref(false);
 const resultsRef = ref(null);
 const selectionRef = ref(null);
 const selectionCollapsed = ref(false);
+const currentSelectedLeagueIds = ref([]); // Track the leagues used for the current bundle
 
 // Bundle state - use separate objects for optimal and display bundle
 const bundleState = ref({
@@ -239,6 +240,8 @@ const displayPrice = ref(maxPrice.value);
 // When selections change, reset build state
 onMounted(() => {
   console.log('Component mounted');
+  // Initialize with current selection
+  currentSelectedLeagueIds.value = [...store.selectedLeagueIds];
 });
 
 // Reset build state when selections change
@@ -247,6 +250,9 @@ function resetBuildState() {
   isLoading.value = false;
   selectionCollapsed.value = false;
   initialBuild.value = true;
+
+  // Update our tracked league selection with the latest from the store
+  currentSelectedLeagueIds.value = [...store.selectedLeagueIds];
 
   // Clear bundle state
   bundleState.value = {
@@ -259,8 +265,10 @@ function resetBuildState() {
 }
 
 // Watch for selection changes and reset build state
-store.$subscribe(() => {
-  if (hasBuilt.value) {
+store.$subscribe((mutation) => {
+  // Only reset when the selectedLeagueIds array changes
+  if (mutation.storeId === 'streaming' && mutation.type === 'direct' && mutation.events.key === 'selectedLeagueIds') {
+    console.log('League selections changed, resetting build state');
     resetBuildState();
   }
 });
@@ -270,17 +278,22 @@ async function handleBuild() {
 
   // Set loading state and force update
   isLoading.value = true;
+
+  // Ensure we're using the current selection of leagues
+  currentSelectedLeagueIds.value = [...store.selectedLeagueIds];
+  console.log('Current leagues for build:', currentSelectedLeagueIds.value);
+
   await nextTick();
 
   try {
-    console.log('Building bundle for leagues:', store.selectedLeagueIds);
+    console.log('Building bundle for leagues:', currentSelectedLeagueIds.value);
 
     // Short delay for visual feedback
     await new Promise(res => setTimeout(res, 500));
 
-    // Get bundle from store
-    const rawBundle = store.buildOptimalBundle(store.selectedLeagueIds);
-    console.log('Raw bundle from store:', rawBundle);
+    // Get bundle from store using only the current selection
+    const rawBundle = store.buildOptimalBundle(currentSelectedLeagueIds.value);
+    console.log('Raw bundle from store for leagues:', currentSelectedLeagueIds.value, rawBundle);
 
     if (!rawBundle || !rawBundle.services) {
       console.error('No valid bundle returned from store');
@@ -317,9 +330,9 @@ async function handleBuild() {
         selectedLeaguesCoveredDetails: {},
         totalCoveredLeaguesCount: Object.keys(rawBundle.coveredLeagues || {}).length,
         totalCoveragePercentByLeague: {...rawBundle.perLeagueCoverage},
-        overallCoveragePercent: rawBundle.totalCoverage / store.selectedLeagueIds.length,
+        overallCoveragePercent: rawBundle.totalCoverage / currentSelectedLeagueIds.value.length,
         isUnderBudget: true,
-        coversAll: Object.keys(rawBundle.coveredLeagues || {}).length === store.selectedLeagueIds.length
+        coversAll: Object.keys(rawBundle.coveredLeagues || {}).length === currentSelectedLeagueIds.value.length
       };
 
       // Include all selected leagues in the coverage details, even if with 0%
@@ -426,9 +439,9 @@ function updateBundleForPrice(newPrice) {
         totalNumericPrice: optBundle.totalPrice,
         selectedLeaguesCoveredDetails: {},
         totalCoveragePercentByLeague: {...optBundle.perLeagueCoverage},
-        overallCoveragePercent: optBundle.totalCoverage / store.selectedLeagueIds.length,
+        overallCoveragePercent: optBundle.totalCoverage / currentSelectedLeagueIds.value.length,
         isUnderBudget: true,
-        coversAll: Object.keys(optBundle.coveredLeagues || {}).length === store.selectedLeagueIds.length
+        coversAll: Object.keys(optBundle.coveredLeagues || {}).length === currentSelectedLeagueIds.value.length
       };
 
       // Include all selected leagues in the coverage details
@@ -475,9 +488,9 @@ function updateBundleForPrice(newPrice) {
         totalNumericPrice: adjustedBundle.totalPrice,
         selectedLeaguesCoveredDetails: {},
         totalCoveragePercentByLeague: {...adjustedBundle.perLeagueCoverage},
-        overallCoveragePercent: adjustedBundle.totalCoverage / store.selectedLeagueIds.length,
+        overallCoveragePercent: adjustedBundle.totalCoverage / currentSelectedLeagueIds.value.length,
         isUnderBudget: true,
-        coversAll: Object.keys(adjustedBundle.coveredLeagues || {}).length === store.selectedLeagueIds.length
+        coversAll: Object.keys(adjustedBundle.coveredLeagues || {}).length === currentSelectedLeagueIds.value.length
       };
 
       // Include all selected leagues in the coverage details, even if with 0%
@@ -532,7 +545,7 @@ function determineScenario(bundle) {
     .filter(league => league.coveragePercent > 0)
     .length;
 
-  const hasAllLeaguesCovered = leaguesWithCoverage === store.selectedLeagueIds.length;
+  const hasAllLeaguesCovered = leaguesWithCoverage === currentSelectedLeagueIds.value.length;
 
   // Check if bundle price is over the user's current max price setting
   const isUnderBudget = bundle.totalNumericPrice <= maxPrice.value;
