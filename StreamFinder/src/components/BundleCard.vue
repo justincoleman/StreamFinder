@@ -104,8 +104,16 @@
       <div class="grid grid-cols-2 gap-2 mt-1 w-full max-w-full min-w-0">
         <span class="text-base font-bold font-mono text-black dark:text-white col-span-2">Service Links:</span>
         <template v-for="service in item.servicesInvolved" :key="service.id">
-          <span class="font-extrabold font-mono text-lg uppercase border-b-4 border-black dark:border-white pb-1 service-btn break-words w-full min-w-0 rounded-lg">{{ service.name }}</span>
+          <a :href="getServiceLink(service.id)" target="_blank" rel="noopener noreferrer"
+             class="font-extrabold font-mono text-lg uppercase border-b-4 border-black dark:border-white pb-1 service-btn break-words w-full min-w-0 rounded-lg hover:text-primary dark:hover:text-accent-yellow transition-colors">
+            {{ service.name }}
+          </a>
         </template>
+      </div>
+
+      <!-- Affiliate Disclaimer -->
+      <div v-if="hasAffiliateLinks" class="mt-3 text-xs text-gray-500 dark:text-gray-400 text-center italic">
+        <p>Some links above are affiliate links. If you purchase through these links, we may receive a small commission at no additional cost to you.</p>
       </div>
 
       <!-- Details Section (only if there are details) -->
@@ -182,6 +190,8 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue';
+import affiliateLinks from '@/data/affiliateLinks.json';
+import serviceHomepages from '@/data/serviceHomepages.json';
 
 const props = defineProps({
   item: { type: Object, required: true },
@@ -282,6 +292,16 @@ function openLeagueModal(league) {
 }
 function closeLeagueModal() {
   modalLeague.value = null;
+}
+
+const hasAffiliateLinks = computed(() => {
+  // Check if any service in the bundle has an affiliate link available
+  return props.item.servicesInvolved.some(service => affiliateLinks[service.id]);
+});
+
+function getServiceLink(serviceId) {
+  // First try to use affiliate link, then fall back to service homepage
+  return affiliateLinks[serviceId] || serviceHomepages[serviceId] || '#';
 }
 </script>
 
