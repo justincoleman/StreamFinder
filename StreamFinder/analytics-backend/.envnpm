@@ -1,0 +1,1 @@
+DASHBOARD_PASSWORD=echo PORT=3003 >> .env.example && echo DASHBOARD_PASSWORD=your-secure-password-here >> .env.exampleG3ng3r88 install dotenv

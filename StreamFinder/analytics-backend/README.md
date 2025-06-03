@@ -47,13 +47,29 @@ cd analytics-backend
 npm install
 ```
 
+### Configuration
+
+1. **Copy environment template:**
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Set your secure password:**
+   ```bash
+   # Edit .env file
+   DASHBOARD_PASSWORD=your-secure-password-here
+   PORT=3003
+   SESSION_SECRET=your-random-session-secret
+   ```
+
 ### Development
 
 ```bash
 npm run dev
 ```
 
-Server starts on `http://localhost:3002`
+Server starts on `http://localhost:3003`
 
 ### Production
 
@@ -61,21 +77,69 @@ Server starts on `http://localhost:3002`
 npm start
 ```
 
+## 🔒 Security
+
+### Dashboard Authentication
+
+The analytics dashboard is password-protected:
+
+- **Login Required** - All dashboard access requires authentication
+- **Session Management** - 24-hour login sessions
+- **Environment Variables** - Password stored in `.env` file (not in code)
+- **Logout Functionality** - Secure session termination
+
+### Security Best Practices
+
+⚠️ **Important**: Never commit passwords to version control
+
+```bash
+# ✅ Good - Use environment variables
+DASHBOARD_PASSWORD=your-secure-password
+
+# ❌ Bad - Hardcoded in source code
+const password = 'hardcoded-password'
+```
+
+### Environment Setup
+
+1. **Create `.env` file** (excluded from Git):
+
+   ```bash
+   DASHBOARD_PASSWORD=!!YourSecurePassword123
+   SESSION_SECRET=random-session-secret-key
+   PORT=3003
+   ```
+
+2. **File permissions** (Linux/Mac):
+
+   ```bash
+   chmod 600 .env  # Restrict file access
+   ```
+
+3. **Production deployment**:
+   - Use platform environment variables (Heroku, AWS, etc.)
+   - Never use default passwords
+   - Use HTTPS in production
+   - Set `secure: true` for session cookies over HTTPS
+
 ## 📈 Dashboard
 
 Access the analytics dashboard at:
 
 ```
-http://localhost:3002/dashboard
+http://localhost:3003/dashboard
 ```
+
+**Login required** - Enter your configured password to access.
 
 Dashboard includes:
 
 - **Overview Stats** - Total events, sessions, bundles, shares
-- **Popular Services** - Most used services (7-day window)
-- **Popular Leagues** - Most selected leagues (7-day window)
-- **Daily Activity** - Events and sessions over 30 days
+- **Popular Services Chart** - Doughnut chart of service usage (7-day window)
+- **Popular Leagues Chart** - Bar chart of league selection (7-day window)
+- **Daily Activity Chart** - Line chart of events and sessions (30 days)
 - **Real-time Updates** - Auto-refresh every 30 seconds
+- **Logout Button** - Secure session termination
 
 ## 🔗 API Endpoints
 

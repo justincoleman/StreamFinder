@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue';
 
 const isEnabled = ref(true);
-const baseURL = ref(import.meta.env.VITE_ANALYTICS_API || 'http://localhost:3002/api');
+const baseURL = ref(import.meta.env.VITE_ANALYTICS_API || 'http://localhost:3003/api');
 
 // Anonymous session ID for tracking (no personal data)
 const sessionId = ref(generateSessionId());
@@ -180,6 +180,46 @@ export async function getAnalyticsSummary() {
   }
 }
 
+// Get bundle log with filtering and pagination
+export async function getBundleLog(options = {}) {
+  if (!isEnabled.value) return { bundles: [], pagination: null };
+
+  try {
+    const {
+      page = 1,
+      limit = 50,
+      sortBy = 'creation_count',
+      sortOrder = 'desc',
+      search = '',
+      minPrice = 0,
+      maxPrice = 1000,
+      minCount = 1
+    } = options;
+
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      sortBy,
+      sortOrder,
+      search,
+      minPrice: minPrice.toString(),
+      maxPrice: maxPrice.toString(),
+      minCount: minCount.toString()
+    });
+
+    const response = await fetch(`${baseURL.value}/bundle-log?${queryParams}`);
+
+    if (!response.ok) {
+      throw new Error(`Bundle log API responded with status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.warn('Failed to fetch bundle log:', error);
+    return { bundles: [], pagination: null };
+  }
+}
+
 // Helper functions
 function getUserAgentCategory() {
   const ua = navigator.userAgent.toLowerCase();
@@ -211,6 +251,7 @@ export function useAnalytics() {
     trackUserInteraction,
     getPopularBundles,
     getAnalyticsSummary,
+    getBundleLog,
     setEnabled: (enabled) => { isEnabled.value = enabled; },
     setAPIUrl: (url) => { baseURL.value = url; }
   };
