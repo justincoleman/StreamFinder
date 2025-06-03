@@ -649,20 +649,18 @@ async function handleBuild() {
         removedServices: []
       };
 
-      // Track analytics for bundle generation
-      try {
-        await trackBundleGenerated({
-          services: rawBundle.services,
-          selectedLeagues: currentSelectedLeagueIds.value,
-          preferences: store.leaguePreferences,
-          totalPrice: rawBundle.totalPrice,
-          totalCoverage: rawBundle.totalCoverage,
-          totalWeightedCoverage: rawBundle.totalWeightedCoverage,
-          subscribedServices: store.subscribedServicesDetails
-        });
-      } catch (error) {
-        console.warn('Analytics tracking failed:', error);
-      }
+      // Track analytics for bundle generation (non-blocking)
+      trackBundleGenerated({
+        services: rawBundle.services,
+        selectedLeagues: currentSelectedLeagueIds.value,
+        preferences: store.leaguePreferences,
+        totalPrice: rawBundle.totalPrice,
+        totalCoverage: rawBundle.totalCoverage,
+        totalWeightedCoverage: rawBundle.totalWeightedCoverage,
+        subscribedServices: store.subscribedServicesDetails
+      }).catch(error => {
+        console.warn('Analytics tracking failed (non-blocking):', error);
+      });
 
       // Set max price to bundle price only on initial build
       // Otherwise preserve user's existing max price preference

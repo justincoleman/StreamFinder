@@ -133,10 +133,11 @@ async function sendAnalyticsEvent(event) {
       throw new Error(`Analytics API responded with status: ${response.status}`);
     }
   } catch (error) {
-    // Fail silently in production, but log in development
+    // Always fail silently to prevent blocking the main application
     if (import.meta.env.DEV) {
-      console.warn('Failed to send analytics event:', error);
+      console.warn('Failed to send analytics event:', error.message);
     }
+    // Don't re-throw the error to prevent blocking
   }
 }
 
