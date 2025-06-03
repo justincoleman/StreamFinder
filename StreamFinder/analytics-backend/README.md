@@ -53,7 +53,7 @@ npm install
 npm run dev
 ```
 
-Server starts on `http://localhost:3001`
+Server starts on `http://localhost:3002`
 
 ### Production
 
@@ -66,7 +66,7 @@ npm start
 Access the analytics dashboard at:
 
 ```
-http://localhost:3001/dashboard
+http://localhost:3002/dashboard
 ```
 
 Dashboard includes:
@@ -158,7 +158,7 @@ The system enables smart bundle recommendations by:
 ### Environment Variables
 
 ```bash
-PORT=3001                           # Server port (default: 3001)
+PORT=3002                           # Server port (default: 3002)
 NODE_ENV=production                 # Environment mode
 ```
 
@@ -166,7 +166,7 @@ NODE_ENV=production                 # Environment mode
 
 ```javascript
 // In your .env file
-VITE_ANALYTICS_API=http://localhost:3001/api
+VITE_ANALYTICS_API=http://localhost:3002/api
 ```
 
 ## 📋 Development Notes

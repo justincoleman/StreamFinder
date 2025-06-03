@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue';
 
 const isEnabled = ref(true);
-const baseURL = ref(import.meta.env.VITE_ANALYTICS_API || 'http://localhost:3001/api');
+const baseURL = ref(import.meta.env.VITE_ANALYTICS_API || 'http://localhost:3002/api');
 
 // Anonymous session ID for tracking (no personal data)
 const sessionId = ref(generateSessionId());

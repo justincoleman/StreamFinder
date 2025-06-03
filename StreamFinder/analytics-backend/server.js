@@ -6,10 +6,17 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      "script-src": ["'self'", "'unsafe-inline'"],
+      "style-src": ["'self'", "'unsafe-inline'"]
+    }
+  }
+}));
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
