@@ -536,34 +536,38 @@ app.get('/login', (req, res) => {
     <html>
     <head>
       <title>StreamFinder Analytics - Login</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <style>
         body {
           font-family: Arial, sans-serif;
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           margin: 0;
-          padding: 0;
+          padding: 20px;
           display: flex;
           justify-content: center;
           align-items: center;
           min-height: 100vh;
+          box-sizing: border-box;
         }
         .login-container {
           background: white;
-          padding: 40px;
+          padding: 30px;
           border-radius: 12px;
           box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-          width: 400px;
+          width: 100%;
+          max-width: 400px;
           text-align: center;
+          box-sizing: border-box;
         }
         .logo {
-          font-size: 2.5em;
+          font-size: 2em;
           margin-bottom: 10px;
           color: #667eea;
         }
         h1 {
           color: #333;
-          margin-bottom: 30px;
-          font-size: 1.5em;
+          margin-bottom: 25px;
+          font-size: 1.3em;
         }
         .form-group {
           margin-bottom: 20px;
@@ -574,6 +578,7 @@ app.get('/login', (req, res) => {
           margin-bottom: 8px;
           color: #555;
           font-weight: bold;
+          font-size: 0.9em;
         }
         input[type="password"] {
           width: 100%;
@@ -609,6 +614,29 @@ app.get('/login', (req, res) => {
           border-radius: 4px;
           margin-bottom: 20px;
           border: 1px solid #feb2b2;
+          font-size: 0.9em;
+        }
+
+        /* Mobile responsive breakpoints */
+        @media (min-width: 768px) {
+          body { padding: 0; }
+          .login-container {
+            padding: 40px;
+            width: 400px;
+          }
+          .logo { font-size: 2.5em; }
+          h1 { font-size: 1.5em; margin-bottom: 30px; }
+          label { font-size: 1em; }
+          .error { font-size: 1em; }
+        }
+
+        @media (max-width: 480px) {
+          .login-container {
+            padding: 20px;
+            margin: 10px;
+          }
+          .logo { font-size: 1.8em; }
+          h1 { font-size: 1.2em; margin-bottom: 20px; }
         }
       </style>
     </head>
@@ -653,53 +681,90 @@ app.get('/dashboard', requireAuth, (req, res) => {
     <html>
     <head>
       <title>StreamFinder Analytics Dashboard</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <style>
         body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
-        .header { background: #667eea; color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .header h1 { margin: 0; font-size: 1.5em; }
-        .logout-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 14px; }
+        .header { background: #667eea; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 1.2em; }
+        .logout-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 12px; }
         .logout-btn:hover { background: rgba(255,255,255,0.3); }
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px; }
-        .card { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .card { background: white; padding: 15px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
         .stat { text-align: center; }
-        .stat-value { font-size: 2em; font-weight: bold; color: #667eea; }
-        .stat-label { color: #666; margin-top: 5px; }
-        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .chart-container { position: relative; height: 400px; }
-        .chart-container canvas { max-height: 350px; }
+        .stat-value { font-size: 1.5em; font-weight: bold; color: #667eea; }
+        .stat-label { color: #666; margin-top: 5px; font-size: 0.9em; }
+        .charts-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .chart-container { position: relative; height: 300px; }
+        .chart-container canvas { max-height: 250px; }
         h1 { color: #333; text-align: center; }
-        h2 { color: #667eea; margin-bottom: 15px; }
-        .activity-chart { height: 300px; }
-        .stat-card { background: #f8f9ff; padding: 20px; border-radius: 8px; border: 1px solid #e0e4ff; }
-        .stat-card h3 { margin: 0 0 15px 0; color: #667eea; font-size: 1.1em; }
+        h2 { color: #667eea; margin-bottom: 15px; font-size: 1.3em; }
+        h3 { color: #667eea; margin-bottom: 10px; font-size: 1.1em; }
+        .activity-chart { height: 250px; }
+        .stat-card { background: #f8f9ff; padding: 15px; border-radius: 8px; border: 1px solid #e0e4ff; }
+        .stat-card h3 { margin: 0 0 15px 0; color: #667eea; font-size: 1em; }
         .bundle-info { text-align: center; }
-        .bundle-signature { font-size: 1.2em; font-weight: bold; color: #333; margin-bottom: 10px; word-break: break-word; }
+        .bundle-signature { font-size: 1em; font-weight: bold; color: #333; margin-bottom: 10px; word-break: break-word; }
         .bundle-details { margin-bottom: 15px; text-align: left; }
         .services-section, .leagues-section { margin-bottom: 8px; }
-        .section-label { font-weight: bold; color: #667eea; margin-right: 8px; }
-        .services-list, .leagues-list { display: inline; font-family: monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
-        .bundle-stats { display: flex; justify-content: space-between; align-items: center; }
-        .bundle-price { background: #e8f4fd; color: #0066cc; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
-        .bundle-count { background: #f0f9e8; color: #22c55e; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+        .section-label { font-weight: bold; color: #667eea; margin-right: 8px; font-size: 0.9em; }
+        .services-list, .leagues-list { display: inline; font-family: monospace; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-size: 0.8em; word-break: break-word; }
+        .bundle-stats { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .bundle-price { background: #e8f4fd; color: #0066cc; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.9em; }
+        .bundle-count { background: #f0f9e8; color: #22c55e; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.9em; }
         .bundle-actions { margin-top: 20px; text-align: center; }
-        .view-log-btn { background: #667eea; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; display: inline-block; font-weight: bold; }
+        .view-log-btn { background: #667eea; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 0.9em; }
         .view-log-btn:hover { background: #5a67d8; }
-        .bundles-table-container { margin-bottom: 20px; }
-        .bundles-table { border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; }
+        .bundles-table-container { margin-bottom: 20px; overflow-x: auto; }
+        .bundles-table { border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; min-width: 600px; }
         .table-header { background: #f8f9fa; display: grid; grid-template-columns: 2fr 2fr 1fr 1fr; gap: 1px; padding: 0; font-weight: bold; color: #333; }
-        .table-header > div { padding: 12px; background: #f8f9fa; }
+        .table-header > div { padding: 8px; background: #f8f9fa; font-size: 0.9em; }
         .table-body { background: white; }
         .bundle-row { display: grid; grid-template-columns: 2fr 2fr 1fr 1fr; gap: 1px; border-bottom: 1px solid #f0f0f0; }
         .bundle-row:last-child { border-bottom: none; }
-        .bundle-row > div { padding: 12px; background: white; }
+        .bundle-row > div { padding: 8px; background: white; font-size: 0.8em; }
         .bundle-row:hover { background: #f8f9ff; }
         .bundle-row:hover > div { background: #f8f9ff; }
-        .col-services, .col-leagues { font-family: monospace; font-size: 0.9em; }
+        .col-services, .col-leagues { font-family: monospace; word-break: break-word; }
         .col-price { text-align: center; font-weight: bold; color: #0066cc; }
         .col-count { text-align: center; font-weight: bold; color: #22c55e; }
         .loading { padding: 20px; text-align: center; color: #666; }
+
+        /* Mobile responsive breakpoints */
+        @media (min-width: 768px) {
+          .header { padding: 15px 40px; }
+          .header h1 { font-size: 1.5em; }
+          .logout-btn { padding: 8px 16px; font-size: 14px; }
+          .container { padding: 40px; }
+          .card { padding: 20px; margin: 20px 0; }
+          .stats { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+          .stat-value { font-size: 2em; }
+          .stat-label { font-size: 1em; }
+          .charts-grid { grid-template-columns: 1fr 1fr; }
+          .chart-container { height: 400px; }
+          .chart-container canvas { max-height: 350px; }
+          .activity-chart { height: 300px; }
+          .stat-card { padding: 20px; }
+          .stat-card h3 { font-size: 1.1em; }
+          .bundle-signature { font-size: 1.2em; }
+          .section-label { font-size: 1em; }
+          .services-list, .leagues-list { font-size: 1em; }
+          .bundle-price, .bundle-count { font-size: 1em; }
+          .view-log-btn { padding: 10px 20px; font-size: 1em; }
+          .table-header > div { padding: 12px; font-size: 1em; }
+          .bundle-row > div { padding: 12px; font-size: 0.9em; }
+          h2 { font-size: 1.5em; }
+          h3 { font-size: 1.2em; }
+        }
+
+        @media (max-width: 480px) {
+          .bundles-table { min-width: 500px; }
+          .table-header > div { padding: 6px; font-size: 0.8em; }
+          .bundle-row > div { padding: 6px; font-size: 0.7em; }
+          .bundle-stats { flex-direction: column; align-items: stretch; }
+          .bundle-price, .bundle-count { text-align: center; }
+        }
       </style>
     </head>
     <body>

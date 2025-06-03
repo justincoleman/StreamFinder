@@ -6,16 +6,17 @@
           v-for="tab in tabs"
           :key="tab.id"
           @click="$emit('tab-changed', tab.id)"
-          class="px-6 py-3 font-bold font-display text-lg uppercase tracking-wider transition-all border-r-4 border-black dark:border-primary last:border-r-0"
+          class="px-3 sm:px-6 py-2 sm:py-3 font-bold font-display text-sm sm:text-lg uppercase tracking-wider transition-all border-r-4 border-black dark:border-primary last:border-r-0"
           :class="[
             tab.id === activeTab
               ? 'bg-primary text-black dark:bg-indigo-500 dark:text-white'
               : 'bg-white text-black hover:bg-primary/10 dark:bg-slate-800 dark:text-white dark:hover:bg-indigo-500/20'
           ]"
         >
-          <span class="flex items-center gap-2">
-            <span class="text-xl">{{ tab.icon }}</span>
-            {{ tab.label }}
+          <span class="flex items-center gap-1 sm:gap-2">
+            <span class="text-lg sm:text-xl">{{ tab.icon }}</span>
+            <span class="hidden sm:inline">{{ tab.label }}</span>
+            <span class="sm:hidden text-xs font-medium">{{ tab.shortLabel }}</span>
           </span>
         </button>
       </div>
@@ -37,11 +38,13 @@ const tabs = [
   {
     id: 'builder',
     label: 'Bundle Builder',
+    shortLabel: 'Builder',
     icon: '🎯'
   },
   {
     id: 'leaderboard',
     label: 'Leaderboard',
+    shortLabel: 'Leaders',
     icon: '🏆'
   }
 ]
