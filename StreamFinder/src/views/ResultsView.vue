@@ -317,8 +317,10 @@ import { ref, nextTick, onMounted, onUnmounted, computed } from 'vue';
 import BundleCard from '@/components/BundleCard.vue';
 import SkeletonLoader from '@/components/SkeletonLoader.vue';
 import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
+import { useAnalytics } from '@/composables/useAnalytics';
 
 const store = useStreamingStoreWithPersistence();
+const { trackBundleGenerated } = useAnalytics();
 
 // UI state
 const maxPrice = ref(100); // Start with a high max price
@@ -646,6 +648,21 @@ async function handleBuild() {
         missingLeaguesBundle: getMissingLeagues(formattedBundle),
         removedServices: []
       };
+
+      // Track analytics for bundle generation
+      try {
+        await trackBundleGenerated({
+          services: rawBundle.services,
+          selectedLeagues: currentSelectedLeagueIds.value,
+          preferences: store.leaguePreferences,
+          totalPrice: rawBundle.totalPrice,
+          totalCoverage: rawBundle.totalCoverage,
+          totalWeightedCoverage: rawBundle.totalWeightedCoverage,
+          subscribedServices: store.subscribedServicesDetails
+        });
+      } catch (error) {
+        console.warn('Analytics tracking failed:', error);
+      }
 
       // Set max price to bundle price only on initial build
       // Otherwise preserve user's existing max price preference

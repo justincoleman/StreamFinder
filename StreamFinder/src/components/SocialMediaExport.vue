@@ -102,6 +102,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue';
+import { useAnalytics } from '@/composables/useAnalytics';
 
 const props = defineProps({
   bundle: {
@@ -120,6 +121,8 @@ const isGenerating = ref(false);
 const successMessage = ref('');
 const previewCanvas = ref(null);
 const exportCanvas = ref(null);
+
+const { trackSocialMediaExport } = useAnalytics();
 
 // Computed dimensions based on format
 const previewDimensions = computed(() => {
@@ -292,6 +295,13 @@ async function downloadImage() {
 
     successMessage.value = 'Image downloaded successfully!';
     setTimeout(() => successMessage.value = '', 3000);
+
+    // Track analytics for download
+    try {
+      await trackSocialMediaExport(props.bundle, selectedFormat.value);
+    } catch (error) {
+      console.warn('Analytics tracking failed:', error);
+    }
   } catch (error) {
     console.error('Download failed:', error);
   } finally {
@@ -320,6 +330,13 @@ async function copyToClipboard() {
         ]);
         successMessage.value = 'Image copied to clipboard!';
         setTimeout(() => successMessage.value = '', 3000);
+
+        // Track analytics for copy
+        try {
+          await trackSocialMediaExport(props.bundle, selectedFormat.value);
+        } catch (error) {
+          console.warn('Analytics tracking failed:', error);
+        }
       } catch (error) {
         console.error('Clipboard copy failed:', error);
         successMessage.value = 'Copy failed. Please try download instead.';
