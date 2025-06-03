@@ -130,6 +130,14 @@
         </template>
       </div>
 
+      <!-- Social Media Export -->
+      <div class="mt-4 flex justify-center">
+        <SocialMediaExport
+          :bundle="item"
+          :selectedLeagues="selectedLeagues"
+        />
+      </div>
+
       <!-- Affiliate Disclaimer -->
       <div v-if="hasAffiliateLinks" class="mt-3 text-xs text-gray-500 dark:text-gray-400 text-center italic">
         <p>Some links above are affiliate links. If you purchase through these links, we may receive a small commission at no additional cost to you.</p>
@@ -219,6 +227,7 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import affiliateLinks from '@/data/affiliateLinks.json';
 import serviceHomepages from '@/data/serviceHomepages.json';
+import SocialMediaExport from '@/components/SocialMediaExport.vue';
 import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
 
 const store = useStreamingStoreWithPersistence();

@@ -30,6 +30,7 @@ StreamFinder v3 is intentionally designed as a single-screen application where a
 - **`ResultsView.vue`** - Main application interface (37KB, 995 lines)
 - **`BundleCard.vue`** - Bundle display with coverage visualization (22KB, 459 lines)
 - **`SkeletonLoader.vue`** - Loading state placeholders (3.4KB, 94 lines)
+- **`SocialMediaExport.vue`** - Social media graphic generation and export (8KB, 280 lines)
 
 ### **State Management**
 
@@ -43,7 +44,8 @@ StreamFinder v3 is intentionally designed as a single-screen application where a
 src/
 ├── components/              # Reusable UI components
 │   ├── BundleCard.vue      # 🎯 Bundle recommendation display
-│   └── SkeletonLoader.vue  # ⏳ Loading state management
+│   ├── SkeletonLoader.vue  # ⏳ Loading state management
+│   └── SocialMediaExport.vue # 📱 Social media graphic generation
 ├── data/                   # Static data files (JSON)
 │   ├── streamingServicesData.json  # 📊 Service definitions
 │   ├── leagues.json               # 🏆 Sports league data
