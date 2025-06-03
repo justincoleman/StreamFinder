@@ -24,7 +24,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Roboto', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Oswald', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['Roboto Mono', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         xl: '1.5rem',
@@ -49,6 +51,10 @@ export default {
     'bg-accent-yellow',
     'border-accent-green',
     'bg-accent-green',
+    // Font classes
+    'font-display',
+    'font-sans',
+    'font-mono',
   ],
 }
 

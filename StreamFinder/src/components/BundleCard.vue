@@ -8,11 +8,11 @@
     >
       <div v-if="item.badge" class="flex justify-center mb-4 mt-2">
         <span v-if="item.badge === 'Best Value'"
-          class="bundle-badge bundle-badge-best inline-block px-6 py-2 border-4 border-indigo-white bg-accent-yellow text-indigo-500 font-extrabold font-mono text-lg uppercase tracking-widest rounded-lg dark:bg-indigo-500 dark:text-white dark:border-white">
+          class="bundle-badge bundle-badge-best inline-block px-6 py-2 border-4 border-indigo-white bg-accent-yellow text-indigo-500 font-bold font-display text-lg uppercase tracking-widest rounded-lg dark:bg-indigo-500 dark:text-white dark:border-white">
           {{ item.badge }}
         </span>
         <span v-else
-          class="bundle-badge bundle-badge-main inline-block px-4 sm:px-6 py-2 border-4 border-white bg-indigo-500 text-white font-extrabold font-mono text-lg uppercase tracking-widest rounded-lg">
+          class="bundle-badge bundle-badge-main inline-block px-4 sm:px-6 py-2 border-4 border-white bg-indigo-500 text-white font-bold font-display text-lg uppercase tracking-widest rounded-lg">
           {{ item.badge }}
         </span>
       </div>
@@ -20,14 +20,14 @@
       <div class="flex flex-row items-start justify-between mb-2 w-full min-w-0">
         <div class="flex flex-col gap-1 min-w-0 w-full">
           <div class="flex flex-row items-center gap-4 flex-wrap min-w-0 w-full">
-            <h3 class="text-2xl md:text-3xl font-extrabold font-mono text-center text-black uppercase tracking-widest dark:text-white min-w-0 w-3/3 mt-3">
+            <h3 class="text-2xl md:text-3xl font-bold font-display text-center text-black uppercase tracking-widest dark:text-white min-w-0 w-3/3 mt-3">
               <template v-if="item.servicesInvolved.length > 1">Recommended Bundle</template>
               <template v-else>{{ item.servicesInvolved[0]?.name || item.displayName }}</template>
             </h3>
           </div>
           <div class="flex items-baseline gap-2 flex-shrink-0 mb-2 mt-2 justify-center">
             <span class="text-4xl md:text-5xl font-extrabold text-indigo-600 dark:text-accent-yellow whitespace-nowrap">${{ item.totalNumericPrice?.toFixed(2) }}</span>
-            <span class="text-base font-mono text-black dark:text-white">/mo</span>
+            <span class="text-base font-sans text-black dark:text-white">/mo</span>
           </div>
           <div v-if="whyThisBundle" class="flex flex-col items-center gap-2 mb-1 mt-1 w-full min-w-0 break-words text-center">
             <span class="flex items-center gap-2 justify-center">
@@ -35,7 +35,7 @@
                 <path d="M13 16h-1v-4h-1m1-4h.01" stroke-linecap="round" stroke-linejoin="round"/>
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
               </svg>
-              <span class="text-base text-black dark:text-blue-300 font-mono font-bold break-words w-full min-w-0">{{ whyThisBundle }}</span>
+              <span class="text-base text-black dark:text-blue-300 font-sans font-medium break-words w-full min-w-0">{{ whyThisBundle }}</span>
             </span>
           </div>
         </div>
@@ -80,7 +80,7 @@
               </span>
             </span>
           </div>
-          <div class="flex items-center justify-center text-xs font-extrabold font-mono text-center mb-1 mt-1 uppercase gap-2 w-full min-w-0 flex-wrap break-words">
+          <div class="flex items-center justify-center text-xs font-bold font-display text-center mb-1 mt-1 uppercase gap-2 w-full min-w-0 flex-wrap break-words">
             <span class="text-2xl">{{ league.icon }}</span>
             <span>{{ league.name }}</span>
             <span v-if="league.id === 'nfl' && getNflCoverageCapped >= 80" class="ml-2 flex items-center">
@@ -108,10 +108,10 @@
 
       <!-- Services Included as Links -->
       <div class="grid grid-cols-2 gap-2 mt-1 w-full max-w-full min-w-0">
-        <span class="text-base font-bold font-mono text-black dark:text-white col-span-2">Service Links:</span>
+        <span class="text-base font-bold font-display text-black dark:text-white col-span-2">Service Links:</span>
         <template v-for="service in item.servicesInvolved" :key="service.id">
           <a :href="getServiceLink(service.id)" target="_blank" rel="noopener noreferrer"
-             class="font-extrabold font-mono text-lg uppercase border-b-4 border-black dark:border-white pb-1 service-btn break-words w-full min-w-0 rounded-lg hover:text-primary dark:hover:text-accent-yellow transition-colors">
+             class="font-bold font-display text-lg uppercase border-b-4 border-black dark:border-white pb-1 service-btn break-words w-full min-w-0 rounded-lg hover:text-primary dark:hover:text-accent-yellow transition-colors">
             {{ service.name }}
           </a>
         </template>
@@ -125,7 +125,7 @@
       <!-- Details Section (only if there are details) -->
       <div v-if="hasDetails" class="mt-2">
         <button @click="detailsOpen = !detailsOpen"
-                class="inline-flex items-center gap-2 px-4 py-2 border-4 border-black bg-white text-black font-extrabold font-mono text-base shadow-none hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 mt-4 uppercase tracking-widest dark:bg-black dark:text-white dark:border-primary w-full justify-center rounded-lg"
+                class="inline-flex items-center gap-2 px-4 py-2 border-4 border-black bg-white text-black font-bold font-display text-base shadow-none hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 mt-4 uppercase tracking-widest dark:bg-black dark:text-white dark:border-primary w-full justify-center rounded-lg"
                 :aria-expanded="detailsOpen"
                 aria-controls="bundle-details">
           <svg v-if="!detailsOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
@@ -140,7 +140,7 @@
           <div v-show="detailsOpen" id="bundle-details" class="mt-2">
             <!-- Brutalist Coverage Table: Services as rows, Leagues as columns, checkmark if covered -->
             <div class="overflow-x-auto">
-              <table class="min-w-full border-4 border-black dark:border-white bg-white dark:bg-black text-base font-mono brutalist-table">
+              <table class="min-w-full border-4 border-black dark:border-white bg-white dark:bg-black text-base font-sans brutalist-table">
                 <thead>
                   <tr>
                     <th class="p-4 font-extrabold text-left border-4 border-black dark:border-indigo-500 uppercase">Service</th>
@@ -181,19 +181,19 @@
           <div class="flex flex-col sm:flex-row items-center gap-4 mb-4 w-full">
             <span class="text-4xl">{{ modalLeague.icon }}</span>
             <div class="flex flex-col items-center sm:items-start">
-              <span class="text-2xl font-extrabold font-mono uppercase break-words w-full">{{ modalLeague.name }}</span>
-              <span class="font-mono font-bold" :class="getPreferenceColor(getLeaguePreference(modalLeague.id))">
+              <span class="text-2xl font-bold font-display uppercase break-words w-full">{{ modalLeague.name }}</span>
+              <span class="font-sans font-medium" :class="getPreferenceColor(getLeaguePreference(modalLeague.id))">
                 Importance: {{ getPreferenceLabel(getLeaguePreference(modalLeague.id)) }}
               </span>
             </div>
           </div>
           <div>
-            <h2 class="text-lg font-extrabold font-mono uppercase mb-2 text-black dark:text-white break-words">Coverage Details</h2>
-            <ul class="list-disc ml-6 text-base font-mono text-black dark:text-white break-words">
+            <h2 class="text-lg font-bold font-display uppercase mb-2 text-black dark:text-white break-words">Coverage Details</h2>
+            <ul class="list-disc ml-6 text-base font-sans text-black dark:text-white break-words">
               <li v-for="note in getAggregatedCoverageNotes(modalLeague.id)" :key="note">{{ note }}</li>
             </ul>
           </div>
-          <div v-if="(item.selectedLeaguesCoveredDetails[modalLeague.id]?.coveragePercent || 0) < 100" class="mt-4 text-sm text-orange-600 dark:text-orange-400 font-mono break-words">
+          <div v-if="(item.selectedLeaguesCoveredDetails[modalLeague.id]?.coveragePercent || 0) < 100" class="mt-4 text-sm text-orange-600 dark:text-orange-400 font-sans break-words">
             <span v-if="modalLeague.id === 'nfl'">Due to US broadcast rights and blackout rules, 100% live NFL coverage is not possible, even with all available services.</span>
           </div>
         </div>

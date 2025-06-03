@@ -2,8 +2,8 @@
   <div class="min-h-screen bg-white dark:bg-slate-900">
     <div class="container mx-auto p-4 sm:p-6 max-w-full sm:max-w-2xl">
       <header class="mb-8 text-center">
-        <h1 class="text-4xl sm:text-7xl font-extrabold font-mono text-black uppercase tracking-widest mb-2 border-b-8 border-primary inline-block pb-2 dark:text-white">STREAMFINDER</h1>
-        <p class="text-lg sm:text-xl font-bold font-mono text-black mt-4 leading-relaxed dark:text-white">
+        <img src="@/assets/StreamFinderLogo.svg" alt="StreamFinder Logo" class="mx-auto mb-4 transform hover:scale-105 transition-transform duration-300" style="height:80px;width:auto;" />
+        <p class="text-lg sm:text-xl font-display font-bold text-black mt-4 leading-relaxed dark:text-white">
           Find the best streaming bundle for your favorite sports leagues—instantly.
         </p>
         <!--
@@ -20,7 +20,7 @@
 
       <!-- Expand/collapse toggle -->
       <div v-if="selectionCollapsed" class="flex justify-center mb-4">
-        <button @click="selectionCollapsed = false" class="px-6 py-3 bg-primary text-black font-extrabold font-mono uppercase tracking-widest rounded-lg shadow hover:bg-black hover:text-white transition text-xl">
+        <button @click="selectionCollapsed = false" class="px-6 py-3 bg-primary text-black font-bold font-display uppercase tracking-widest rounded-lg shadow hover:bg-black hover:text-white transition text-xl">
           Expand Selections
         </button>
       </div>
@@ -30,7 +30,7 @@
         <section v-show="!selectionCollapsed" ref="selectionRef" class="bg-white border-4 border-black p-4 sm:p-6 mb-8 flex flex-col gap-6 mb-10 dark:bg-[#181824] dark:border-primary rounded-lg">
           <!-- League Selection -->
           <div>
-            <h2 class="text-2xl font-bold font-mono text-primary mb-2 uppercase tracking-wider">Select Leagues:</h2>
+            <h2 class="text-2xl font-bold font-display text-primary mb-2 uppercase tracking-wider">Select Leagues:</h2>
             <div class="flex flex-wrap gap-2">
               <label v-for="league in store.allLeaguesFlat" :key="league.id"
                 class="flex items-center gap-2 px-3 py-2 border-2 border-black bg-white cursor-pointer select-none hover:bg-primary/10 transition dark:bg-[#232336] dark:border-primary dark:hover:bg-primary/20 rounded-lg"
@@ -41,7 +41,7 @@
               >
                 <input type="checkbox" v-model="store.selectedLeagueIds" :value="league.id" class="accent-primary w-5 h-5 border-2 border-black dark:border-primary" />
                 <span class="text-lg">{{ league.icon }}</span>
-                <span class="text-base font-bold font-mono text-black dark:text-white"
+                <span class="text-base font-sans font-medium text-black dark:text-white"
                   :class="store.selectedLeagueIds.includes(league.id) ? 'text-black dark:text-black' : 'dark:text-white'"
                 >{{ league.name }}</span>
               </label>
@@ -51,13 +51,13 @@
           <!-- League Preference Rankings -->
           <div v-if="store.selectedLeagueIds.length > 0">
             <div class="flex items-center justify-between mb-4">
-              <h2 class="text-2xl font-bold font-mono text-primary uppercase tracking-wider">League Importance:</h2>
+              <h2 class="text-2xl font-bold font-display text-primary uppercase tracking-wider">League Importance:</h2>
               <div class="flex gap-2">
-                <button @click="resetLeaguePreferences" class="px-3 py-1 border-2 border-black bg-white text-black font-bold font-mono text-sm hover:bg-black hover:text-white dark:bg-[#232336] dark:text-white dark:border-primary dark:hover:bg-primary/20 rounded-lg">
+                <button @click="resetLeaguePreferences" class="px-3 py-1 border-2 border-black bg-white text-black font-medium font-sans text-sm hover:bg-black hover:text-white dark:bg-[#232336] dark:text-white dark:border-primary dark:hover:bg-primary/20 rounded-lg">
                   Reset All
                 </button>
                 <div class="preset-menu-container relative">
-                  <button @click.stop="togglePresetMenu" class="px-3 py-1 border-2 border-black bg-white text-black font-bold font-mono text-sm hover:bg-black hover:text-white dark:bg-[#232336] dark:text-white dark:border-primary dark:hover:bg-primary/20 rounded-lg">
+                  <button @click.stop="togglePresetMenu" class="px-3 py-1 border-2 border-black bg-white text-black font-medium font-sans text-sm hover:bg-black hover:text-white dark:bg-[#232336] dark:text-white dark:border-primary dark:hover:bg-primary/20 rounded-lg">
                     Quick Rank
                   </button>
                   <div v-if="showPresetMenu" class="preset-menu-container absolute top-full right-0 mt-1 z-50 bg-white dark:bg-[#181824] border-2 border-black dark:border-primary rounded-lg shadow-lg p-2 w-48">
@@ -65,7 +65,7 @@
                       v-for="preset in rankingPresets"
                       :key="preset.name"
                       @click.stop="applyPreset(preset.rankingRules)"
-                      class="block w-full text-left px-2 py-1 text-sm font-mono hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
+                      class="block w-full text-left px-2 py-1 text-sm font-sans hover:bg-gray-100 dark:hover:bg-slate-700 rounded"
                     >
                       {{ preset.name }}
                     </button>
@@ -73,22 +73,22 @@
                 </div>
               </div>
             </div>
-            <p class="text-sm font-mono text-black dark:text-white mb-4">
+            <p class="text-sm font-sans text-black dark:text-white mb-4">
               Drag the sliders to rank your leagues by importance. Higher importance leagues will get priority in bundle recommendations.
             </p>
             <div class="space-y-4">
               <div v-for="league in store.selectedLeagues" :key="league.id" class="flex flex-col gap-2 p-3 border-2 border-black dark:border-primary rounded-lg">
                 <div class="flex items-center gap-2">
                   <span class="text-xl">{{ league.icon }}</span>
-                  <span class="text-base font-bold font-mono text-black dark:text-white">{{ league.name }}</span>
+                  <span class="text-base font-sans font-medium text-black dark:text-white">{{ league.name }}</span>
                   <div class="ml-auto flex items-center">
-                    <span class="font-mono font-bold" :class="getWeightColor(store.leaguePreferences[league.id] || 3)">
+                    <span class="font-sans font-medium" :class="getWeightColor(store.leaguePreferences[league.id] || 3)">
                       {{ getWeightLabel(store.leaguePreferences[league.id] || 3) }}
                     </span>
                   </div>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="text-xs font-mono text-black dark:text-white">Low</span>
+                  <span class="text-xs font-sans text-black dark:text-white">Low</span>
                   <input
                     type="range"
                     min="1"
@@ -98,7 +98,7 @@
                     @input="updateLeaguePreference(league.id, $event.target.value)"
                     class="w-full accent-primary dark:accent-indigo-500"
                   />
-                  <span class="text-xs font-mono text-black dark:text-white">High</span>
+                  <span class="text-xs font-sans text-black dark:text-white">High</span>
                 </div>
               </div>
             </div>
@@ -108,7 +108,7 @@
             <button
               @click="handleBuild"
               :disabled="store.selectedLeagueIds.length === 0 || isLoading"
-              class="px-8 py-3 border-4 border-black bg-primary text-black font-extrabold font-mono text-xl uppercase tracking-widest transition disabled:opacity-40 disabled:cursor-not-allowed dark:bg-indigo-500 dark:text-white dark:border-primary rounded-lg"
+              class="px-8 py-3 border-4 border-black bg-primary text-black font-bold font-display text-xl uppercase tracking-widest transition disabled:opacity-40 disabled:cursor-not-allowed dark:bg-indigo-500 dark:text-white dark:border-primary rounded-lg"
             >
               <span v-if="!isLoading">Build</span>
               <span v-else>Building your bundle...</span>
@@ -137,7 +137,7 @@
         <!-- Selected Leagues Summary -->
         <div v-if="bundleState.bundleToShow" class="flex flex-wrap gap-2 justify-center mb-6">
           <span v-for="league in store.selectedLeaguesSortedByPreference" :key="league.id"
-            class="flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-100 border border-slate-300 text-base font-bold font-mono uppercase text-black shadow-sm">
+            class="flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-100 border border-slate-300 text-base font-sans font-medium uppercase text-black shadow-sm">
               <span class="text-xl">{{ league.icon }}</span>
               <span>{{ league.name }}</span>
               <span class="ml-1" :class="getWeightColor(store.leaguePreferences[league.id] || 3)">
@@ -148,7 +148,7 @@
 
         <!-- Max Price Slider - Always visible if bundle exists -->
         <div v-if="bundleState.bundleToShow" class="mb-6">
-          <label class="block text-base font-bold font-mono text-black mb-1 dark:text-white">
+          <label class="block text-base font-display font-bold text-black mb-1 dark:text-white">
             Max Price: <span class="font-bold text-primary dark:text-accent-yellow">${{ displayPrice }}</span>
           </label>
           <input
@@ -177,7 +177,7 @@
             <span v-else-if="bundleState.removedServices.length > 0" class="text-amber-500 text-xl">ℹ️</span>
             <span v-else-if="bundleState.scenario === 'C' || bundleState.scenario === 'D'" class="text-amber-500 text-xl">💰</span>
 
-            <h3 class="font-extrabold font-mono text-lg uppercase">
+            <h3 class="font-display font-bold text-lg uppercase">
               <span v-if="bundleState.missingLeaguesBundle.length > 0">Missing Coverage</span>
               <span v-else-if="bundleState.removedServices.length > 0">Services Removed</span>
               <span v-else>Budget Alert</span>
@@ -187,25 +187,25 @@
           <!-- Main message content -->
           <div class="space-y-3">
             <!-- Services removed message -->
-            <p v-if="bundleState.removedServices.length > 0" class="font-mono font-bold">
+            <p v-if="bundleState.removedServices.length > 0" class="font-sans font-medium">
               To fit your budget of ${{ maxPrice }}, we removed: {{ bundleState.removedServices.join(', ') }}.
               <span class="block text-sm mt-1">This affects the coverage of some leagues. See details below.</span>
             </p>
 
             <!-- Bundle over budget message -->
             <p v-if="bundleState.scenario === 'C' || bundleState.scenario === 'D' && !bundleState.removedServices.length">
-              <span class="inline-block bg-accent-yellow text-black px-3 py-1 rounded-md border border-amber-400 font-bold font-mono text-sm mb-2">Bundle Over Budget</span>
-              <span class="block">This is the best bundle we could find, but it costs <b>${{ bundleState.bundleToShow.totalNumericPrice.toFixed(2) }}</b> which is over your max price of <b>${{ maxPrice }}</b>. Try adjusting your budget or selections for a better match.</span>
+              <span class="inline-block bg-accent-yellow text-black px-3 py-1 rounded-md border border-amber-400 font-display font-bold text-sm mb-2">Bundle Over Budget</span>
+              <span class="block font-sans">This is the best bundle we could find, but it costs <b>${{ bundleState.bundleToShow.totalNumericPrice.toFixed(2) }}</b> which is over your max price of <b>${{ maxPrice }}</b>. Try adjusting your budget or selections for a better match.</span>
             </p>
 
             <!-- Missing leagues message -->
             <div v-if="bundleState.missingLeaguesBundle.length > 0">
-              <p class="font-mono font-bold mb-2">
+              <p class="font-sans font-medium mb-2">
                 No bundle covers all your selected leagues. The following leagues are <b>not covered</b>:
               </p>
               <ul class="flex flex-wrap gap-2">
                 <li v-for="league in bundleState.missingLeaguesBundle" :key="league.id"
-                    class="flex items-center gap-1 px-2 py-1 rounded-md bg-white text-red-700 font-bold font-mono text-sm uppercase shadow-sm border border-red-200">
+                    class="flex items-center gap-1 px-2 py-1 rounded-md bg-white text-red-700 font-sans font-medium text-sm uppercase shadow-sm border border-red-200">
                   <span class="text-lg">{{ league.icon }}</span>
                   <span>{{ league.name }}</span>
                 </li>
@@ -252,14 +252,14 @@
         <button
           v-if="hasBuilt && !isLoading"
           @click="scrollToSelection"
-          class="w-full relative px-4 py-4 border-b-4 border-black bg-white text-black font-extrabold font-mono text-lg shadow-none hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 uppercase tracking-widest dark:bg-black dark:text-white dark:border-primary text-center mt-2 mb-4 rounded-lg"
+          class="w-full relative px-4 py-4 border-b-4 border-black bg-white text-black font-bold font-display text-lg shadow-none hover:bg-black hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 uppercase tracking-widest dark:bg-black dark:text-white dark:border-primary text-center mt-2 mb-4 rounded-lg"
           style="z-index:10;"
         >
           CHANGE SELECTIONS ^
         </button>
       </transition>
 
-      <footer class="text-center mt-12 text-sm text-slate-400">
+      <footer class="text-center mt-12 text-sm text-slate-400 font-sans">
         <p>&copy; {{ new Date().getFullYear() }} StreamFinder. All rights reserved.</p>
       </footer>
     </div>

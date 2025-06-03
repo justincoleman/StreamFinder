@@ -1,0 +1,15 @@
+<svg width="340" height="60" viewBox="0 0 340 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="StreamFinder Logo">
+  <defs>
+    <linearGradient id="sf-gradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3a186a" />
+      <stop offset="100%" stop-color="#a259ff" />
+    </linearGradient>
+  </defs>
+  <!-- Play Button Icon -->
+  <g>
+    <circle cx="32" cy="30" r="24" fill="#fff" stroke="url(#sf-gradient)" stroke-width="4" />
+    <polygon points="26,20 44,30 26,40" fill="url(#sf-gradient)" />
+  </g>
+  <!-- Logo Text -->
+  <text x="70" y="42" font-family="Oswald, sans-serif" font-size="38" font-weight="700" letter-spacing="2" fill="url(#sf-gradient)" style="">StreamFinder</text>
+</svg>
