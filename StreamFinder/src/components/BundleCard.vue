@@ -48,62 +48,75 @@
 
       <!-- Per-League Coverage (for all selected leagues) -->
       <div v-if="leaguesWithCoverage.length > 0" class="mt-2 mb-1 grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-2 w-full max-w-full min-w-0">
-        <div v-for="league in leaguesWithCoverage" :key="league.id" class="flex flex-col items-center flex-1 min-w-0 box-border rounded-lg">
-          <div class="relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 mb-2">
-            <svg viewBox="0 0 48 48" class="absolute top-0 left-0 w-20 h-20 sm:w-24 sm:h-24">
-              <defs>
-                <linearGradient id="coverage-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#3a186a" />
-                  <stop offset="100%" stop-color="#a259ff" />
-                </linearGradient>
-              </defs>
-              <circle cx="24" cy="24" r="20" fill="none" stroke="#e5e7eb" stroke-width="6" />
-              <circle
-                cx="24" cy="24" r="20" fill="none"
-                :stroke="(league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) === 100 ? 'url(#coverage-gradient)' : 'url(#coverage-gradient)'"
-                stroke-width="6"
-                :stroke-dasharray="(league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) * 1.257 + ', 125.7'"
-                stroke-linecap="round"
-                :style="{ transition: 'stroke-dasharray 0.7s cubic-bezier(0.4,0,0.2,1)' }"
-                transform="rotate(-90 24 24)"
-              />
-            </svg>
-            <span class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-              <span class="text-lg font-extrabold px-2 dark:text-white">{{ league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0 }}%</span>
-            </span>
-            <!-- NFL warning icon and tooltip -->
-            <span v-if="league.id === 'nfl' && getNflCoverageCapped >= 80" class="absolute top-2 right-2 z-20">
-              <span class="relative group">
-                <span class="absolute left-1/2 -translate-x-1/2 mt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus:opacity-100 group-focus:pointer-events-auto transition-opacity duration-200 bg-amber-100 text-amber-700 border border-amber-400 rounded px-3 py-2 text-xs font-bold shadow-xl w-56 text-center">
-                  This bundle does NOT provide 100% live NFL coverage. You will miss FOX Sunday games and out-of-market games.
+        <transition-group
+          name="stagger"
+          tag="div"
+          class="contents"
+          @before-enter="beforeEnterStagger"
+          @enter="enterStagger"
+        >
+          <div
+            v-for="(league, index) in leaguesWithCoverage"
+            :key="league.id"
+            :data-index="index"
+            class="flex flex-col items-center flex-1 min-w-0 box-border rounded-lg"
+          >
+            <div class="relative flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 mb-2">
+              <svg viewBox="0 0 48 48" class="absolute top-0 left-0 w-20 h-20 sm:w-24 sm:h-24">
+                <defs>
+                  <linearGradient id="coverage-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#3a186a" />
+                    <stop offset="100%" stop-color="#a259ff" />
+                  </linearGradient>
+                </defs>
+                <circle cx="24" cy="24" r="20" fill="none" stroke="#e5e7eb" stroke-width="6" />
+                <circle
+                  cx="24" cy="24" r="20" fill="none"
+                  :stroke="(league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) === 100 ? 'url(#coverage-gradient)' : 'url(#coverage-gradient)'"
+                  stroke-width="6"
+                  :stroke-dasharray="(league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) * 1.257 + ', 125.7'"
+                  stroke-linecap="round"
+                  :style="{ transition: 'stroke-dasharray 1.2s cubic-bezier(0.4, 0, 0.2, 1)' }"
+                  transform="rotate(-90 24 24)"
+                />
+              </svg>
+              <span class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+                <span class="text-lg font-extrabold px-2 dark:text-white">{{ league.id === 'nfl' ? getNflCoverageCapped : item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0 }}%</span>
+              </span>
+              <!-- NFL warning icon and tooltip -->
+              <span v-if="league.id === 'nfl' && getNflCoverageCapped >= 80" class="absolute top-2 right-2 z-20">
+                <span class="relative group">
+                  <span class="absolute left-1/2 -translate-x-1/2 mt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus:opacity-100 group-focus:pointer-events-auto transition-opacity duration-200 bg-amber-100 text-amber-700 border border-amber-400 rounded px-3 py-2 text-xs font-bold shadow-xl w-56 text-center">
+                    This bundle does NOT provide 100% live NFL coverage. You will miss FOX Sunday games and out-of-market games.
+                  </span>
                 </span>
               </span>
-            </span>
-          </div>
-          <div class="flex items-center justify-center text-xs font-bold font-display text-center mb-1 mt-1 uppercase gap-2 w-full min-w-0 flex-wrap break-words">
-            <span class="text-2xl">{{ league.icon }}</span>
-            <span>{{ league.name }}</span>
-            <span v-if="league.id === 'nfl' && getNflCoverageCapped >= 80" class="ml-2 flex items-center">
-              <span class="relative group">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" tabindex="0">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <span class="absolute left-1/2 -translate-x-1/2 mt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus:opacity-100 group-focus:pointer-events-auto transition-opacity duration-200 bg-amber-100 text-amber-700 border border-amber-400 rounded px-3 py-2 text-xs font-bold shadow-xl w-56 text-center z-50">
-                  This bundle does NOT provide 100% live NFL coverage. You will miss FOX Sunday games and out-of-market games.
+            </div>
+            <div class="flex items-center justify-center text-xs font-bold font-display text-center mb-1 mt-1 uppercase gap-2 w-full min-w-0 flex-wrap break-words">
+              <span class="text-2xl">{{ league.icon }}</span>
+              <span>{{ league.name }}</span>
+              <span v-if="league.id === 'nfl' && getNflCoverageCapped >= 80" class="ml-2 flex items-center">
+                <span class="relative group">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" tabindex="0">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span class="absolute left-1/2 -translate-x-1/2 mt-2 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto group-focus:opacity-100 group-focus:pointer-events-auto transition-opacity duration-200 bg-amber-100 text-amber-700 border border-amber-400 rounded px-3 py-2 text-xs font-bold shadow-xl w-56 text-center z-50">
+                    This bundle does NOT provide 100% live NFL coverage. You will miss FOX Sunday games and out-of-market games.
+                  </span>
                 </span>
               </span>
-            </span>
+            </div>
+            <div v-if="getAggregatedCoverageNotes(league.id).length" class="mb-1">
+              <button @click="openLeagueModal(league)" class="text-xs text-blue-600 dark:text-blue-300 underline hover:no-underline focus:outline-none">
+                More Info
+              </button>
+            </div>
+            <div v-if="(item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) < 100" class="mt-1 text-xs text-orange-600 dark:text-orange-400">
+              <span v-if="showBudgetMessage">Your budget does not allow for full {{ league.name }} coverage. </span>
+              <span v-if="league.id === 'nfl'">Due to US broadcast rights and blackout rules, 100% live NFL coverage is not possible, even with all available services.</span>
+            </div>
           </div>
-          <div v-if="getAggregatedCoverageNotes(league.id).length" class="mb-1">
-            <button @click="openLeagueModal(league)" class="text-xs text-blue-600 dark:text-blue-300 underline hover:no-underline focus:outline-none">
-              More Info
-            </button>
-          </div>
-          <div v-if="(item.selectedLeaguesCoveredDetails[league.id].coveragePercent || 0) < 100" class="mt-1 text-xs text-orange-600 dark:text-orange-400">
-            <span v-if="showBudgetMessage">Your budget does not allow for full {{ league.name }} coverage. </span>
-            <span v-if="league.id === 'nfl'">Due to US broadcast rights and blackout rules, 100% live NFL coverage is not possible, even with all available services.</span>
-          </div>
-        </div>
+        </transition-group>
       </div>
 
       <!-- Services Included as Links -->
@@ -348,6 +361,27 @@ function getPreferenceColor(weight) {
   };
   return colors[weight] || 'text-green-500';
 }
+
+// Animation methods for staggered entrance
+function beforeEnterStagger(el) {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(30px) scale(0.8)';
+}
+
+function enterStagger(el, done) {
+  const index = parseInt(el.dataset.index);
+  const delay = index * 150; // 150ms delay between each item
+
+  setTimeout(() => {
+    el.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0) scale(1)';
+
+    setTimeout(() => {
+      done();
+    }, 600);
+  }, delay);
+}
 </script>
 
 <style scoped>
@@ -360,6 +394,16 @@ function getPreferenceColor(weight) {
   opacity: 0;
   max-height: 0;
 }
+
+/* Stagger animation styles */
+.stagger-enter-active {
+  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.stagger-enter-from {
+  opacity: 0;
+  transform: translateY(30px) scale(0.8);
+}
+
 .brutalist-table th,
 .brutalist-table td {
   border-width: 4px !important;
@@ -388,6 +432,28 @@ function getPreferenceColor(weight) {
     padding: 0.5rem !important;
     font-size: 0.8rem !important;
     word-break: break-word;
+  }
+}
+
+/* Enhanced hover animations */
+button:hover {
+  transform: translateY(-1px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Circle progress animation enhancement */
+.coverage-circle {
+  animation: fade-in-scale 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes fade-in-scale {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 </style>

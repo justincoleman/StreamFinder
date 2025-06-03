@@ -1,101 +1,223 @@
-# StreamFinder
+# StreamFinder v3
 
-**StreamFinder** helps users discover the best streaming service or bundle for their selected sports leagues, with a modern, glassmorphic UI and full dark/light theme support.
+**StreamFinder** is a modern Vue.js application that helps users discover the best streaming service bundles for their favorite sports leagues. Features a single-screen experience with enhanced loading animations, multi-stage progress tracking, and smart bundle recommendations.
 
-## Features
+## ✨ Features
 
-- ⚡ **Vue 3 + Vite** for fast, modern development
-- 🎨 **Tailwind CSS v4** for utility-first, glassmorphic design
-- 🌗 **Auto dark/light theme** (system preference; manual toggle removed for consistency)
-- 🏆 **Smart recommendations**: Highlights top bundles/services for your chosen leagues
-- 🗂️ **Compare options**: See all possible bundles and services, sortable by price or coverage
-- 🧩 **Reusable components**: StreamingServiceCard, BundleCard, LeagueSelector, and more
-- 🗃️ **Pinia** for state management
-- 🔗 **Vue Router** for navigation
-- ♿ **Accessibility improvements**: Semantic HTML, ARIA attributes, keyboard navigation, and visible focus states
-- 📱 **Mobile responsive**: Optimized layouts and touch targets for all devices
-- 📦 **Ready for Netlify deployment**
+- ⚡ **Vue 3 + Vite** - Fast, modern development experience
+- 🎨 **Tailwind CSS v4** - Modern design with enhanced typography (Oswald + Roboto fonts)
+- 🌗 **Auto dark/light theme** - Follows system preferences
+- 🏆 **Smart bundle recommendations** - AI-powered suggestions based on league preferences
+- 📊 **League importance ranking** - Weighted recommendations based on user priorities
+- 🎬 **Enhanced loading states** - Multi-stage progress with skeleton screens
+- ✨ **Smooth animations** - Staggered entrance effects and micro-interactions
+- 🗃️ **Pinia state management** - Persistent user preferences
+- ♿ **Accessibility focused** - Semantic HTML, ARIA attributes, keyboard navigation
+- 📱 **Mobile responsive** - Optimized for all device sizes
+- 🚀 **Ready for deployment** - Optimized build for production
 
-## Project Structure
+## 🏗️ Architecture
+
+### Single-Screen Application
+
+StreamFinder v3 uses a simplified single-screen architecture where all functionality is consolidated into the main `ResultsView` component:
 
 ```
-src/
-  components/         # UI components (StreamingServiceCard, BundleCard, LeagueSelector, etc.)
-  composables/        # Custom Vue composables (useTheme.js for theme management)
-  data/               # Static data (leagues, streaming services, links)
-  router/             # Vue Router setup
-  stores/             # Pinia store (streamingStore.js)
-  views/              # Main views/pages (LeagueSelectionView, SubscribedServicesView, ResultsView)
-  assets/             # Images, icons, etc.
-public/
-  favicon.ico         # App favicon
-  _redirects          # (Optional, for Netlify SPA routing)
+StreamFinder/
+├── src/
+│   ├── components/          # Reusable UI components
+│   │   ├── BundleCard.vue   # Displays bundle recommendations
+│   │   └── SkeletonLoader.vue # Loading state placeholders
+│   ├── data/                # Static data files
+│   │   ├── streamingServicesData.json # Service definitions
+│   │   ├── leagues.json     # Sports league data
+│   │   ├── affiliateLinks.json # Monetization links
+│   │   └── serviceHomepages.json # Fallback links
+│   ├── stores/              # Pinia state management
+│   │   └── streamingStore.js # Main application store
+│   ├── composables/         # Vue composables
+│   │   └── useTheme.js      # Theme management
+│   ├── views/               # Main application views
+│   │   └── ResultsView.vue  # Primary single-screen interface
+│   ├── router/              # Vue Router setup
+│   ├── assets/              # Static assets (logos, images)
+│   └── main.js              # Application entry point
+└── public/                  # Public assets and deployment files
 ```
 
-## Getting Started
+## 🚀 Getting Started
 
-### 1. Install dependencies
+### Prerequisites
 
-```sh
+- Node.js 18+
+- npm or yarn
+
+### Installation & Development
+
+```bash
+# 1. Install dependencies
 npm install
-```
 
-### 2. Run the app in development
-
-```sh
+# 2. Start development server
 npm run dev
+
+# 3. Open http://localhost:5173 in your browser
 ```
 
-### 3. Build for production
+### Build & Deployment
 
-```sh
+```bash
+# Build for production
 npm run build
-```
 
-### 4. Preview the production build
-
-```sh
+# Preview production build locally
 npm run preview
-```
 
-### 5. Lint and format
-
-```sh
+# Lint and format code
 npm run lint
 npm run format
 ```
 
-## Deployment (Netlify)
+## 🧩 Key Components
 
-1. **Push your code to a GitHub/GitLab/Bitbucket repo.**
-2. **Connect your repo to Netlify** and use these settings:
-   - **Build command:** `npm run build`
-   - **Publish directory:** `dist`
-3. _(Optional, for Vue Router history mode)_
-   Add a file called `_redirects` to your `public/` folder with this content:
+### `ResultsView.vue` (37KB, 995 lines)
+
+The main application interface featuring:
+
+- **League Selection** - Multi-select with importance ranking
+- **Enhanced Loading** - 3-stage progress (Analyzing → Calculating → Optimizing)
+- **Bundle Display** - Smart recommendations with coverage visualization
+- **Price Controls** - Dynamic budget adjustment with real-time updates
+
+### `BundleCard.vue` (22KB, 459 lines)
+
+Sophisticated bundle display component with:
+
+- **Coverage Visualization** - Animated progress circles per league
+- **Service Integration** - Affiliate links and service details
+- **NFL Coverage Warning** - Special handling for broadcast limitations
+- **Expandable Details** - Service-by-league coverage matrix
+
+### `streamingStore.js` (30KB, 768 lines)
+
+Comprehensive Pinia store managing:
+
+- **Bundle Generation** - Advanced algorithms for optimal combinations
+- **Budget Optimization** - Dynamic service removal based on price constraints
+- **Preference Management** - Weighted league importance system
+- **Data Persistence** - Local storage integration
+
+## 🎨 Design System
+
+### Typography
+
+- **Display Font**: Oswald - Used for headers, buttons, and emphasis
+- **Body Font**: Roboto - Used for readable text and UI elements
+- **Mono Font**: Roboto Mono - Used for technical data
+
+### Theme System
+
+- **Auto Theme Detection** - Follows system dark/light preference
+- **CSS Custom Properties** - Consistent color tokens
+- **Tailwind Integration** - Dark mode class toggling
+
+### Animation Philosophy
+
+- **Staggered Entrance** - 150ms delays between elements
+- **Smooth Transitions** - Cubic-bezier easing for professional feel
+- **Loading States** - Multi-stage progress with realistic timing
+- **Micro-interactions** - Hover effects and button feedback
+
+## 📊 Data Structure
+
+### League Configuration
+
+Each league in `leagues.json` includes:
+
+```json
+{
+  "id": "nfl",
+  "name": "NFL",
+  "icon": "🏈",
+  "category": "American Football"
+}
+```
+
+### Service Configuration
+
+Each service in `streamingServicesData.json` includes:
+
+```json
+{
+  "id": "service_id",
+  "name": "Service Name",
+  "price": 79.99,
+  "leagues": {
+    "league_id": {
+      "coveragePercent": 85,
+      "coverage": "Description of coverage"
+    }
+  }
+}
+```
+
+## 🔧 Development Tips
+
+### Adding New Leagues
+
+1. Add league definition to `src/data/leagues.json`
+2. Update service coverage in `src/data/streamingServicesData.json`
+3. Test bundle generation in the store
+
+### Adding New Services
+
+1. Add service to `src/data/streamingServicesData.json`
+2. Include league coverage percentages
+3. Add links to `serviceHomepages.json` and optionally `affiliateLinks.json`
+
+### Debugging Bundle Logic
+
+- Use browser dev tools to inspect `bundleState` in ResultsView
+- Check console for bundle generation logs
+- Test edge cases with different league combinations
+
+## 🚀 Deployment
+
+### Netlify (Recommended)
+
+1. **Connect Repository** - Link your GitHub/GitLab repo
+2. **Build Settings**:
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+3. **SPA Routing** - Add `_redirects` file to `public/`:
    ```
    /*    /index.html   200
    ```
 
-## Theming
+### Vercel
 
-- Theme is managed via `useTheme.js` composable.
-- Follows system preference by default. Manual toggle was removed for consistency and to avoid override issues with Tailwind v4 and Vite plugin.
-- Applies `dark` or `light` class to `<html>` for Tailwind dark mode.
+1. Import repository
+2. Framework preset: Vue.js
+3. Build command: `npm run build`
+4. Output directory: `dist`
 
-## Accessibility & Mobile Responsiveness
+## 🤝 Contributing
 
-- All main views and components use semantic HTML elements (e.g., `<section>`, `<article>`, `<button>`, `<nav>`).
-- ARIA attributes are used for improved screen reader support (e.g., `aria-label`, `aria-expanded`).
-- All interactive elements are keyboard accessible and have visible focus states.
-- Color contrast and font sizes are checked for readability.
-- Layouts are fully responsive, with touch-friendly targets and spacing for mobile devices.
+### Code Style
 
-## Credits
+- Use Prettier for formatting (`npm run format`)
+- Follow Vue.js style guide
+- Write descriptive commit messages
+- Add comments for complex logic
 
-- Built with [Vue 3](https://vuejs.org/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/), [Pinia](https://pinia.vuejs.org/), and [Vue Router](https://router.vuejs.org/).
-- UI/UX design: glassmorphic, modern, responsive, and accessible.
+### Testing Checklist
+
+- [ ] Test all league combinations
+- [ ] Verify mobile responsiveness
+- [ ] Check dark/light theme switching
+- [ ] Test bundle price adjustments
+- [ ] Validate accessibility with screen readers
 
 ---
 
-**Enjoy using StreamFinder!**
+**Built with Vue 3, Vite, Tailwind CSS, and Pinia**

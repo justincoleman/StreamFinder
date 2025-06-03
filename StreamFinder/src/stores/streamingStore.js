@@ -4,7 +4,11 @@ import allServicesData from '@/data/streamingServicesData.json';
 import { watch } from 'vue';
 import allLeaguesByCategory from '@/data/leagues.json';
 
-// Helper function to parse price string to a number
+/**
+ * Parses a price string to extract numeric value
+ * @param {string} priceString - Price string like "$79.99/month"
+ * @returns {number} Numeric price value or Infinity if invalid
+ */
 function parsePrice(priceString) {
   if (!priceString || typeof priceString !== 'string') {
     return Infinity;
@@ -13,7 +17,14 @@ function parsePrice(priceString) {
   return match ? parseFloat(match[0]) : Infinity;
 }
 
-// Memoized helper to calculate unique covered leagues for a set of services
+/**
+ * Memoized helper to calculate bundle coverage details
+ * Caches results to avoid recalculating for same service/league combinations
+ * @param {Array} servicesInBundle - Array of streaming services
+ * @param {Array} selectedLeagueIds - Array of selected league IDs
+ * @param {Array} allLeaguesFlat - Flattened array of all available leagues
+ * @returns {Object} Coverage details with count and league information
+ */
 const getBundleCoverageDetails = (() => {
   const cache = new Map();
 
@@ -27,21 +38,21 @@ const getBundleCoverageDetails = (() => {
       return cache.get(cacheKey);
     }
 
-  const coveredLeaguesSet = new Set();
+    const coveredLeaguesSet = new Set();
     const coveredLeaguesDetails = {};
 
-  servicesInBundle.forEach(service => {
-    selectedLeagueIds.forEach(leagueId => {
+    servicesInBundle.forEach(service => {
+      selectedLeagueIds.forEach(leagueId => {
         if (service.leagues && service.leagues[leagueId]) {
-        coveredLeaguesSet.add(leagueId);
-        const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
-        if (!coveredLeaguesDetails[leagueId]) {
-          coveredLeaguesDetails[leagueId] = {
-            name: leagueInfo ? leagueInfo.name : leagueId,
-            icon: leagueInfo ? leagueInfo.icon : '?',
+          coveredLeaguesSet.add(leagueId);
+          const leagueInfo = allLeaguesFlat.find(l => l.id === leagueId);
+          if (!coveredLeaguesDetails[leagueId]) {
+            coveredLeaguesDetails[leagueId] = {
+              name: leagueInfo ? leagueInfo.name : leagueId,
+              icon: leagueInfo ? leagueInfo.icon : '?',
               channels: [],
-          };
-        }
+            };
+          }
           const serviceChannels = service.leagues[leagueId].channels.map(ch => `${ch} (on ${service.name})`);
           coveredLeaguesDetails[leagueId].channels = [...new Set([...(coveredLeaguesDetails[leagueId].channels || []), ...serviceChannels])];
         }
@@ -477,7 +488,10 @@ export const useStreamingStore = defineStore('streaming', {
       });
     },
     /**
-     * Build the optimal bundle for the selected leagues (max total summed coverage, regardless of price)
+     * Builds the optimal streaming bundle for selected leagues
+     * Uses weighted coverage based on user preferences to find best combination
+     * @param {Array} selectedLeagueIds - Array of league IDs to optimize for
+     * @returns {Object|null} Bundle object with services, price, and coverage details
      */
     buildOptimalBundle(selectedLeagueIds) {
       const allLeaguesFlat = this.allLeaguesFlat;
@@ -564,8 +578,12 @@ export const useStreamingStore = defineStore('streaming', {
     },
 
     /**
-     * Adjust a bundle to fit under a new max price by removing services with least impact on total coverage
-     * Returns a new bundle object or null if impossible
+     * Adjusts an existing bundle to fit within a specified budget
+     * Intelligently removes services with minimal impact on weighted coverage
+     * @param {Object} bundle - Original bundle object with services and coverage data
+     * @param {number} maxPrice - Maximum allowed price for the adjusted bundle
+     * @param {number} tolerance - Price tolerance for flexibility (default: 2)
+     * @returns {Object|null} Adjusted bundle object or null if impossible to fit budget
      */
     adjustBundleForBudget(bundle, maxPrice, tolerance = 2) {
       if (!bundle || !bundle.services || bundle.services.length === 0) return null;

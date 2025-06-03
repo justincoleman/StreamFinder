@@ -117,14 +117,52 @@
         </section>
       </transition>
 
-      <!-- Loading Animation -->
+      <!-- Enhanced Loading Animation -->
       <transition name="fade-slide">
-        <div v-if="isLoading" class="flex flex-col items-center justify-center my-12" key="loading">
-          <svg class="animate-spin h-16 w-16 text-primary dark:text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-          </svg>
-          <div class="text-xl font-mono font-extrabold uppercase text-black dark:text-white tracking-widest">Building your bundle...</div>
+        <div v-if="isLoading" ref="loadingRef" class="flex flex-col items-center justify-center my-12" key="loading">
+          <!-- Animated Loading Spinner -->
+          <div class="relative mb-6">
+            <svg class="animate-spin h-20 w-20 text-primary dark:text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+            <!-- Progress ring -->
+            <svg class="absolute inset-0 h-20 w-20 transform -rotate-90" viewBox="0 0 24 24">
+              <circle
+                cx="12" cy="12" r="10"
+                stroke="currentColor"
+                stroke-width="2"
+                fill="none"
+                class="text-primary/30 dark:text-indigo-500/30"
+                :stroke-dasharray="63"
+                :stroke-dashoffset="63 - (loadingProgress * 63 / 100)"
+                style="transition: stroke-dashoffset 0.5s ease-in-out"
+              ></circle>
+            </svg>
+          </div>
+
+          <!-- Loading Stage Text -->
+          <div class="text-center mb-4">
+            <div class="text-2xl font-display font-bold uppercase text-black dark:text-white tracking-widest mb-2">
+              {{ loadingStageText }}
+            </div>
+            <div class="text-lg font-sans text-black/70 dark:text-white/70">
+              {{ loadingStageDescription }}
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full max-w-md bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-6">
+            <div
+              class="bg-primary dark:bg-indigo-500 h-2 rounded-full transition-all duration-500 ease-out"
+              :style="{ width: `${loadingProgress}%` }"
+            ></div>
+          </div>
+
+          <!-- Skeleton Preview -->
+          <div class="w-full max-w-2xl mt-8 opacity-50">
+            <SkeletonLoader type="bundle" />
+          </div>
         </div>
       </transition>
 
@@ -227,14 +265,22 @@
 
         <!-- Bundle Results -->
         <div v-else-if="bundleState.bundleToShow">
-          <!-- Bundle Card -->
-          <BundleCard
-            :item="bundleState.bundleToShow"
-            :selectedLeagues="store.selectedLeagues"
-            :maxPrice="maxPrice"
-            class="rounded-lg"
-          />
-          </div>
+          <!-- Bundle Card with staggered animation -->
+          <transition
+            name="slide-up"
+            appear
+            @before-enter="beforeEnter"
+            @enter="enter"
+          >
+            <BundleCard
+              :item="bundleState.bundleToShow"
+              :selectedLeagues="store.selectedLeagues"
+              :maxPrice="maxPrice"
+              class="rounded-lg"
+              style="animation-delay: 0.2s"
+            />
+          </transition>
+        </div>
 
         <!-- No Bundles Found -->
           <div v-else>
@@ -267,8 +313,9 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, nextTick, onMounted, onUnmounted, computed } from 'vue';
 import BundleCard from '@/components/BundleCard.vue';
+import SkeletonLoader from '@/components/SkeletonLoader.vue';
 import { useStreamingStoreWithPersistence } from '@/stores/streamingStore';
 
 const store = useStreamingStoreWithPersistence();
@@ -277,10 +324,52 @@ const store = useStreamingStoreWithPersistence();
 const maxPrice = ref(100); // Start with a high max price
 const hasBuilt = ref(false);
 const isLoading = ref(false);
+const loadingStage = ref(''); // Track which stage of loading we're in
 const resultsRef = ref(null);
+const loadingRef = ref(null);
 const selectionRef = ref(null);
 const selectionCollapsed = ref(false);
 const currentSelectedLeagueIds = ref([]); // Track the leagues used for the current bundle
+
+// Loading stage computeds
+const loadingStageText = computed(() => {
+  switch (loadingStage.value) {
+    case 'analyzing':
+      return 'Analyzing Selections';
+    case 'calculating':
+      return 'Calculating Bundles';
+    case 'optimizing':
+      return 'Optimizing Results';
+    default:
+      return 'Building Your Bundle';
+  }
+});
+
+const loadingStageDescription = computed(() => {
+  switch (loadingStage.value) {
+    case 'analyzing':
+      return 'Reviewing your league preferences and importance rankings...';
+    case 'calculating':
+      return 'Finding the best streaming service combinations...';
+    case 'optimizing':
+      return 'Optimizing for coverage and value...';
+    default:
+      return 'Please wait while we find your perfect bundle...';
+  }
+});
+
+const loadingProgress = computed(() => {
+  switch (loadingStage.value) {
+    case 'analyzing':
+      return 25;
+    case 'calculating':
+      return 65;
+    case 'optimizing':
+      return 90;
+    default:
+      return 0;
+  }
+});
 
 // Bundle state - use separate objects for optimal and display bundle
 const bundleState = ref({
@@ -454,6 +543,7 @@ async function handleBuild() {
 
   // Set loading state and force update
   isLoading.value = true;
+  loadingStage.value = 'analyzing';
 
   // Ensure we're using the current selection of leagues
   currentSelectedLeagueIds.value = [...store.selectedLeagueIds];
@@ -461,11 +551,30 @@ async function handleBuild() {
 
   await nextTick();
 
+  // Scroll to loading animation smoothly
+  await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure loading element is rendered
+  if (loadingRef.value) {
+    loadingRef.value.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest'
+    });
+  }
+
   try {
     console.log('Building bundle for leagues:', currentSelectedLeagueIds.value);
 
-    // Short delay for visual feedback
-    await new Promise(res => setTimeout(res, 500));
+    // Stage 1: Analyzing selections
+    loadingStage.value = 'analyzing';
+    await new Promise(res => setTimeout(res, 1600)); // Increased from 800ms to 1600ms
+
+    // Stage 2: Calculating bundles
+    loadingStage.value = 'calculating';
+    await new Promise(res => setTimeout(res, 1200)); // Increased from 600ms to 1200ms
+
+    // Stage 3: Optimizing results
+    loadingStage.value = 'optimizing';
+    await new Promise(res => setTimeout(res, 800)); // Increased from 400ms to 800ms
 
     // Get bundle from store using only the current selection
     const rawBundle = store.buildOptimalBundle(currentSelectedLeagueIds.value);
@@ -559,17 +668,22 @@ async function handleBuild() {
     // Update UI state
     hasBuilt.value = true;
     isLoading.value = false;
+    loadingStage.value = '';
     selectionCollapsed.value = true;
     initialBuild.value = false;
 
-    // Force UI update and scroll
+    // Force UI update and scroll to results
     await nextTick();
-    await new Promise(res => setTimeout(res, 50)); // Small delay to ensure DOM update
+    await new Promise(res => setTimeout(res, 100)); // Small delay to ensure results are rendered
 
-  if (resultsRef.value) {
-    resultsRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (resultsRef.value) {
+      resultsRef.value.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest'
+      });
+    }
   }
-}
 }
 
 function handlePriceInput(event) {
@@ -751,11 +865,33 @@ function getMissingLeagues(bundle) {
   );
 }
 
+// Animation methods
+function beforeEnter(el) {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(50px) scale(0.9)';
+}
+
+function enter(el, done) {
+  const delay = parseFloat(el.style.animationDelay) * 1000 || 0;
+
+  setTimeout(() => {
+    el.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0) scale(1)';
+
+    setTimeout(() => {
+      done();
+    }, 600);
+  }, delay);
+}
+
 function scrollToSelection() {
   selectionCollapsed.value = false;
-  if (selectionRef.value) {
-    selectionRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  // Scroll to the top of the page for better UX
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
 }
 </script>
 
@@ -768,14 +904,90 @@ function scrollToSelection() {
     max-width: 900px;
   }
 }
+
+/* Enhanced fade animations */
+.fade-slide-enter-active {
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.fade-slide-leave-active {
+  transition: all 0.3s cubic-bezier(0.755, 0.05, 0.855, 0.06);
+}
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scale(1.02);
+}
+
+/* Slide up animation for results */
+.slide-up-enter-active {
+  transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(60px) scale(0.8);
+}
+
+/* Enhanced bounce animation */
 .fade-bounce-enter-active {
-  animation: fade-bounce-in 0.7s cubic-bezier(0.4,0,0.2,1);
+  animation: fade-bounce-in 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 @keyframes fade-bounce-in {
-  0% { opacity: 0; transform: scale(0.95) translateY(40px); }
-  60% { opacity: 1; transform: scale(1.03) translateY(-8px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(100px) rotate(-10deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05) translateY(-10px) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
 }
+
+/* Loading spinner enhancements */
+@keyframes spin-smooth {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin-smooth 2s linear infinite;
+}
+
+/* Pulse animation for skeleton */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Button hover enhancements */
+button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+}
+
 .brutalist-progress {
   border-radius: 0;
 }
